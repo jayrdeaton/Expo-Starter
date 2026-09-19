@@ -1,12 +1,13 @@
 import { Button } from '@rific/feedback-press'
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
 import { LEVEL_COLORS, useToast } from '@rific/toaster'
-import { Stack, useRouter } from 'expo-router'
+import { Stack } from 'expo-router'
 import { StyleSheet, View } from 'react-native'
 import { Divider, Text, useTheme } from 'react-native-paper'
 
+import { safeBack } from '@/utils/navigation'
+
 const ToasterDemo = () => {
-  const router = useRouter()
   const theme = useTheme()
   const toast = useToast()
 
@@ -14,7 +15,7 @@ const ToasterDemo = () => {
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
-        <ScrollViewHeader backAction={() => router.back()} title='Toaster' caption='@rific/toaster' />
+        <ScrollViewHeader backAction={safeBack} title='Toaster' caption='@rific/toaster' />
         <ScrollView contentContainerStyle={styles.container}>
           <Text variant='bodyMedium' style={[styles.desc, { color: theme.colors.onSurfaceVariant }]}>
             Stacking, animated toast notifications with swipe-to-dismiss, a capped visible limit, and a history drawer. Toasts are triggered imperatively via a hook from anywhere in your component tree.

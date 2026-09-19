@@ -1,5 +1,5 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
-import { Provider, themeActions, type ThemeSettings } from '@rific/auto-paper'
+import { Provider, themeActions, type ThemeSettings, useThemeBridgeProps } from '@rific/auto-paper'
 import * as ExpoBlur from 'expo-blur'
 import { useFonts } from 'expo-font'
 import { type ReactNode, useCallback } from 'react'
@@ -28,8 +28,10 @@ export const Theme = ({ children }: ThemeProps) => {
   const [fontsLoaded] = useFonts(MaterialCommunityIcons.font)
   useSplashReady('fonts', fontsLoaded)
 
+  const bridgeProps = useThemeBridgeProps({ initialValue: settings, onChange, onReady })
+
   return (
-    <Provider expoBlur={ExpoBlur} initialValue={settings} onChange={onChange} onReady={onReady}>
+    <Provider expoBlur={ExpoBlur} {...bridgeProps}>
       {children}
     </Provider>
   )

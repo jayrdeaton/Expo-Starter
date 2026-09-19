@@ -1,7 +1,9 @@
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
-import { Stack, useRouter } from 'expo-router'
+import { Stack } from 'expo-router'
 import { Platform, StyleSheet, View } from 'react-native'
 import { Divider, Surface, Text, useTheme } from 'react-native-paper'
+
+import { safeBack } from '@/utils/navigation'
 
 const FEATURES = ['Smooth SVG ring animation driven by React Native Animated', 'Start / stop controlled by a timestamp string, no manual animation state', 'Resume mid-timer with startProgress (0–1)', 'Configurable color, radius, and stroke width', 'Children rendered at the center of the ring, display a countdown, icon, or label', 'onStart / onStop callbacks for side-effects', 'Uses native driver for 60 fps animation without JS thread', 'Zero dependencies beyond react-native-svg']
 
@@ -49,14 +51,13 @@ const CountdownTimer = () => {
 }`
 
 const TimerPage = () => {
-  const router = useRouter()
   const theme = useTheme()
 
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
-        <ScrollViewHeader backAction={() => router.back()} title='@rific/timer' />
+        <ScrollViewHeader backAction={safeBack} title='@rific/timer' />
         <ScrollView contentContainerStyle={styles.container}>
           <Text variant='headlineSmall'>Timer</Text>
           <Text variant='bodyMedium' style={[styles.desc, { color: theme.colors.onSurfaceVariant }]}>

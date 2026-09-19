@@ -23,7 +23,8 @@ jest.mock('@rific/auto-paper', () => ({
     mockProviderCalls.push(props)
     return props.children
   },
-  themeActions: { initialize: (payload: unknown) => ({ payload, type: 'theme/initialize' }) }
+  themeActions: { initialize: (payload: unknown) => ({ payload, type: 'theme/initialize' }) },
+  useThemeBridgeProps: (props: unknown) => props
 }))
 
 const mockMarkSplashReady = markSplashReady as jest.Mock

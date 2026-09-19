@@ -1,9 +1,11 @@
 import { ColorPicker, getThirdColor, useComputedTheme, useThemeSettings } from '@rific/auto-paper'
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
-import { Stack, useRouter } from 'expo-router'
+import { Stack } from 'expo-router'
 import { useMemo, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { Divider, Provider as PaperProvider, Surface, Text, useTheme } from 'react-native-paper'
+
+import { safeBack } from '@/utils/navigation'
 
 // Alternating grid, just enough to show primary and secondary sitting on the derived tertiary surface together.
 const PATTERN_ROWS = [
@@ -54,7 +56,6 @@ const RoleSwatches = () => {
 }
 
 const TwoColorDemo = () => {
-  const router = useRouter()
   const theme = useTheme()
   const {
     settings: { appearance }
@@ -71,7 +72,7 @@ const TwoColorDemo = () => {
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
-        <ScrollViewHeader backAction={() => router.back()} title='Two-Color Theming' caption='@rific/auto-paper' />
+        <ScrollViewHeader backAction={safeBack} title='Two-Color Theming' caption='@rific/auto-paper' />
         <ScrollView contentContainerStyle={styles.container}>
           <Text variant='bodyMedium' style={[styles.desc, { color: theme.colors.onSurfaceVariant }]}>
             {'Pick two colors and '}

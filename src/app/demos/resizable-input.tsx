@@ -1,10 +1,12 @@
 import { IconButton } from '@rific/feedback-press'
 import { ResizableInput, ResizableInputProvider } from '@rific/resizable-input'
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
-import { Stack, useRouter } from 'expo-router'
+import { Stack } from 'expo-router'
 import { useState } from 'react'
 import { Platform, StyleSheet, View } from 'react-native'
 import { Divider, Surface, Text, TextInput as PaperTextInput, useTheme } from 'react-native-paper'
+
+import { safeBack } from '@/utils/navigation'
 
 const HEIGHT_STEP = 20
 const MIN_HEIGHT_FLOOR = 40
@@ -50,7 +52,6 @@ import { TextInput as PaperTextInput } from 'react-native-paper'
 />`
 
 const ResizableInputDemoContent = () => {
-  const router = useRouter()
   const theme = useTheme()
   const [notes, setNotes] = useState<string | null>('')
   const [minHeight, setMinHeight] = useState(80)
@@ -65,7 +66,7 @@ const ResizableInputDemoContent = () => {
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
-        <ScrollViewHeader backAction={() => router.back()} title='Resizable Input' caption='@rific/resizable-input' />
+        <ScrollViewHeader backAction={safeBack} title='Resizable Input' caption='@rific/resizable-input' />
         <ScrollView contentContainerStyle={styles.container}>
           <Text variant='bodyMedium' style={[styles.desc, { color: theme.colors.onSurfaceVariant }]}>
             Auto-growing, drag-resizable text input for React Native. Expands with content automatically and gives users a drag handle to resize manually. Works with any input component; this page configures it to default to react-native-paper&apos;s TextInput.

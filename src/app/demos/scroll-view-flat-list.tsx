@@ -1,9 +1,9 @@
 import { FlatList, PullSearch, type PullSearchHandle, ScrollViewFooter, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
-import { useRouter } from 'expo-router'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { Surface, Text, useTheme } from 'react-native-paper'
 
+import { safeBack } from '@/utils/navigation'
 import { timeout } from '@/utils/timeout'
 
 const ITEMS = ['Apple', 'Apricot', 'Avocado', 'Banana', 'Blackberry', 'Blueberry', 'Cherry', 'Coconut', 'Cranberry', 'Date', 'Dragon Fruit', 'Fig', 'Grape', 'Grapefruit', 'Guava', 'Kiwi', 'Lemon', 'Lime', 'Lychee', 'Mango', 'Melon', 'Nectarine', 'Orange', 'Papaya', 'Passion Fruit', 'Peach', 'Pear', 'Pineapple', 'Plum', 'Pomegranate', 'Raspberry', 'Strawberry', 'Tangerine', 'Watermelon', 'Artichoke', 'Asparagus', 'Broccoli', 'Carrot', 'Cauliflower', 'Celery', 'Cucumber', 'Eggplant', 'Garlic', 'Ginger', 'Kale', 'Lettuce', 'Mushroom', 'Onion', 'Pepper', 'Potato', 'Pumpkin', 'Spinach', 'Tomato', 'Zucchini']
@@ -11,7 +11,6 @@ const ITEMS = ['Apple', 'Apricot', 'Avocado', 'Banana', 'Blackberry', 'Blueberry
 type Item = { key: string }
 
 const FlatListDemo = () => {
-  const router = useRouter()
   const theme = useTheme()
   const [query, setQuery] = useState('')
   const [pullSearchHeight, setPullSearchHeight] = useState(0)
@@ -44,7 +43,7 @@ const FlatListDemo = () => {
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
       <ScrollViewProvider>
-        <ScrollViewHeader backAction={() => router.back()} caption='@rific/scroll-view' title='Flat List' />
+        <ScrollViewHeader backAction={safeBack} caption='@rific/scroll-view' title='Flat List' />
         <FlatList contentContainerStyle={styles.container} data={data} keyExtractor={(item) => item.key} keyboardShouldPersistTaps='handled' ListHeaderComponent={pullSearch} onRefresh={handleRefresh} pullSearchHeight={pullSearchHeight} renderItem={renderItem} />
         <ScrollViewFooter style={styles.footer}>
           <Text variant='labelMedium' style={{ color: theme.colors.onSurfaceVariant }}>

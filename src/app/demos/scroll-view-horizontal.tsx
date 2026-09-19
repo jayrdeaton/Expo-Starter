@@ -1,8 +1,9 @@
 import { FlatList, ScrollViewContext, ScrollViewFooter, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
-import { useRouter } from 'expo-router'
 import { useCallback, useContext, useMemo } from 'react'
 import { StyleSheet, useWindowDimensions, View } from 'react-native'
 import { Text, useTheme } from 'react-native-paper'
+
+import { safeBack } from '@/utils/navigation'
 
 const PAGES = Array.from({ length: 20 }, (_, i) => ({
   key: String(i + 1),
@@ -46,13 +47,12 @@ const HorizontalContent = ({ onBack }: { onBack: () => void }) => {
 }
 
 const HorizontalDemo = () => {
-  const router = useRouter()
   const theme = useTheme()
 
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
       <ScrollViewProvider>
-        <HorizontalContent onBack={() => router.back()} />
+        <HorizontalContent onBack={safeBack} />
       </ScrollViewProvider>
     </View>
   )

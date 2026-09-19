@@ -1,9 +1,10 @@
 import { SegmentedButtons } from '@rific/feedback-press'
 import { FlatList, PullSearch, type PullSearchHandle, ScrollViewFooter, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
-import { useRouter } from 'expo-router'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { Surface, Text, useTheme } from 'react-native-paper'
+
+import { safeBack } from '@/utils/navigation'
 
 const ITEMS = ['Apple', 'Apricot', 'Artichoke', 'Asparagus', 'Avocado', 'Banana', 'Barley', 'Blackberry', 'Blueberry', 'Broccoli', 'Brown Rice', 'Buckwheat', 'Bulgur', 'Carrot', 'Cauliflower', 'Celery', 'Cherry', 'Coconut', 'Corn', 'Cranberry', 'Cucumber', 'Date', 'Dragon Fruit', 'Eggplant', 'Farro', 'Fig', 'Freekeh', 'Garlic', 'Ginger', 'Grape', 'Grapefruit', 'Guava', 'Kamut', 'Kale', 'Kiwi', 'Lemon', 'Lettuce', 'Lime', 'Lychee', 'Mango', 'Melon', 'Millet', 'Mushroom', 'Nectarine', 'Oats', 'Onion', 'Orange', 'Papaya', 'Passion Fruit', 'Peach', 'Pear', 'Pepper', 'Pineapple', 'Plum', 'Pomegranate', 'Potato', 'Pumpkin', 'Quinoa', 'Raspberry', 'Rye', 'Sorghum', 'Spelt', 'Spinach', 'Strawberry', 'Tangerine', 'Teff', 'Tomato', 'Watermelon', 'Wheat', 'White Rice', 'Wild Rice', 'Zucchini']
 
@@ -13,7 +14,6 @@ type Mode = 'list' | 'grid'
 const COLUMNS = 3
 
 const GridDemo = () => {
-  const router = useRouter()
   const theme = useTheme()
   const [mode, setMode] = useState<Mode>('list')
   const numColumns = mode === 'grid' ? COLUMNS : 1
@@ -67,7 +67,7 @@ const GridDemo = () => {
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
       <ScrollViewProvider>
-        <ScrollViewHeader backAction={() => router.back()} centerContent={centerContent} />
+        <ScrollViewHeader backAction={safeBack} centerContent={centerContent} />
         <FlatList columnWrapperStyle={mode === 'grid' ? styles.row : undefined} contentContainerStyle={styles.container} data={data} keyboardShouldPersistTaps='handled' keyExtractor={(item) => item.key} ListHeaderComponent={listHeader} numColumns={numColumns} pullSearchHeight={pullSearchHeight} renderItem={renderItem} />
         <ScrollViewFooter style={styles.footer}>
           <Text variant='labelMedium' style={{ color: theme.colors.onSurfaceVariant }}>

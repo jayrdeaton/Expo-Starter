@@ -1,12 +1,12 @@
 import { Button, Switch } from '@rific/feedback-press'
 import { ScrollView, ScrollViewFooter, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
-import { useRouter } from 'expo-router'
 import { useCallback, useState } from 'react'
 import { Keyboard, Platform, StyleSheet, View } from 'react-native'
 import { Text, TextInput, useTheme } from 'react-native-paper'
 
+import { safeBack } from '@/utils/navigation'
+
 const KeyboardDemo = () => {
-  const router = useRouter()
   const theme = useTheme()
   const [keyboardAware, setKeyboardAware] = useState(true)
   const [footerAboveKeyboard, setFooterAboveKeyboard] = useState(true)
@@ -15,7 +15,7 @@ const KeyboardDemo = () => {
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
       <ScrollViewProvider footerAboveKeyboard={footerAboveKeyboard} footerFixed>
-        <ScrollViewHeader backAction={() => router.back()} caption='@rific/scroll-view' title='Keyboard Aware' />
+        <ScrollViewHeader backAction={safeBack} caption='@rific/scroll-view' title='Keyboard Aware' />
         <ScrollView contentContainerStyle={styles.container} keyboardAware={keyboardAware} keyboardShouldPersistTaps='handled'>
           <Text variant='bodyMedium' style={[styles.desc, { color: theme.colors.onSurfaceVariant }]}>
             When enabled, the scroll view adds the keyboard height to its bottom content inset, so focused fields near the bottom of the form stay above the keyboard instead of getting hidden behind it.

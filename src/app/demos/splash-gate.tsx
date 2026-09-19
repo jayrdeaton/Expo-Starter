@@ -1,11 +1,13 @@
 import { Button, Chip } from '@rific/feedback-press'
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
 import { createGate } from '@rific/splash-gate'
-import { Stack, useRouter } from 'expo-router'
+import { Stack } from 'expo-router'
 import { type ReactNode, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { ActivityIndicator, Divider, Icon, Surface, Text, useTheme } from 'react-native-paper'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
+
+import { safeBack } from '@/utils/navigation'
 
 // A handful of made-up conditions for this demo's own sandboxed "screen" below, not the real
 // app's own gates (see src/utils/splashGate.ts's 'theme'/'fonts', already resolved long before you
@@ -55,7 +57,6 @@ const LockingColorProvider = ({ initialColor, children }: { initialColor: string
 }
 
 const SplashGateDemo = () => {
-  const router = useRouter()
   const theme = useTheme()
   const [gate, setGate] = useState(() => createGate(DEMO_GATES))
   const [readyGates, setReadyGates] = useState<Set<DemoGate>>(new Set())
@@ -92,7 +93,7 @@ const SplashGateDemo = () => {
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
-        <ScrollViewHeader backAction={() => router.back()} title='Splash Gate' caption='@rific/splash-gate' />
+        <ScrollViewHeader backAction={safeBack} title='Splash Gate' caption='@rific/splash-gate' />
         <ScrollView contentContainerStyle={styles.container}>
           <Text variant='bodyMedium' style={[styles.desc, { color: theme.colors.onSurfaceVariant }]}>
             Names every async condition your app&apos;s first screen depends on and holds the splash screen up until all of them report ready, instead of hiding it the moment the first one resolves and letting anything else (an icon font, a hydrated preference) pop in a beat later. Wired into this starter&apos;s own launch in <Text style={styles.code}>Theme.tsx</Text>, see below.

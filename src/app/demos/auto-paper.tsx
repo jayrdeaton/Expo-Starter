@@ -6,6 +6,8 @@ import { useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { Dialog as PaperDialog, Divider, Menu as PaperMenu, Surface, Text } from 'react-native-paper'
 
+import { safeBack } from '@/utils/navigation'
+
 const AutoPaperDemo = () => {
   const router = useRouter()
   // useAutoPaperTheme() is a typed drop-in for react-native-paper's own useTheme(): same theme,
@@ -28,7 +30,7 @@ const AutoPaperDemo = () => {
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
-        <ScrollViewHeader backAction={() => router.back()} title='Auto Paper' caption='@rific/auto-paper' />
+        <ScrollViewHeader backAction={safeBack} title='Auto Paper' caption='@rific/auto-paper' />
         <ScrollView contentContainerStyle={styles.container}>
           <Text variant='bodyMedium' style={[styles.desc, { color: theme.colors.onSurfaceVariant }]}>
             Derives a full Material 3 triadic palette from a single seed color and wires it to system, light, or dark appearance automatically. Theme changes propagate instantly across the entire app.

@@ -2,12 +2,14 @@ import * as AutoPaper from '@rific/auto-paper'
 import { combineDrawerProviders, createDrawer, DrawerProvider } from '@rific/drawer'
 import { Button, IconButton, Switch } from '@rific/feedback-press'
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
-import { Stack, useRouter } from 'expo-router'
+import { Stack } from 'expo-router'
 import { useState } from 'react'
 import { Platform, StyleSheet, View } from 'react-native'
 import { Divider, List, Surface, Text, useTheme } from 'react-native-paper'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+
+import { safeBack } from '@/utils/navigation'
 
 const nav = createDrawer({ side: 'left', width: 280 })
 // blur: true here demonstrates @rific/auto-paper's BlurView on the panel surface, see the
@@ -169,7 +171,6 @@ const { isOpen, open, close } = nav.useDrawer()
 // Rendered as AllDrawersProvider's child (not its parent) so nav.useDrawer()/settings.useDrawer()
 // actually resolve the real Provider values instead of the no-op default context.
 const DrawerDemoContent = () => {
-  const router = useRouter()
   const theme = useTheme()
   const navDrawer = nav.useDrawer()
   const settingsDrawer = settings.useDrawer()
@@ -180,7 +181,7 @@ const DrawerDemoContent = () => {
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
       <Stack.Screen options={{ headerShown: false, gestureEnabled: false }} />
       <ScrollViewProvider>
-        <ScrollViewHeader backAction={() => router.back()} title='@rific/drawer' />
+        <ScrollViewHeader backAction={safeBack} title='@rific/drawer' />
         <ScrollView contentContainerStyle={styles.container}>
           <Text variant='headlineSmall'>Drawer</Text>
           <Text variant='bodyMedium' style={[styles.desc, { color: theme.colors.onSurfaceVariant }]}>

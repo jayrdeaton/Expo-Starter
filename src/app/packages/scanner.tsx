@@ -1,7 +1,9 @@
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
-import { Stack, useRouter } from 'expo-router'
+import { Stack } from 'expo-router'
 import { Platform, StyleSheet, View } from 'react-native'
 import { Divider, Surface, Text, useTheme } from 'react-native-paper'
+
+import { safeBack } from '@/utils/navigation'
 
 const FEATURES = ['Full-screen camera view with animated scan overlay', 'Bounds component draws a highlighted rectangle around detected barcodes', 'TimerRing shows a countdown ring when a scan timeout is configured', 'Pinch-to-zoom with configurable min/max zoom range', 'Scan deduplication, so onScan fires once per unique code per session', 'useScanOverlays hook for building custom animated feedback', 'Photo capture with configurable quality and base64 output', 'Multi-barcode support, detects all codes in frame simultaneously', 'configureScanner()/ScannerProvider set expo-camera, react-native-paper, and react-native-safe-area-context once, app-wide, no per-instance repetition', 'TypeScript types for scan results, bounds, and photo results']
 
@@ -50,14 +52,13 @@ configureScanner({ camera: ExpoCamera, paper: RNPaper, safeArea: SafeAreaContext
 />`
 
 const ScannerPage = () => {
-  const router = useRouter()
   const theme = useTheme()
 
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
-        <ScrollViewHeader backAction={() => router.back()} title='@rific/scanner' />
+        <ScrollViewHeader backAction={safeBack} title='@rific/scanner' />
         <ScrollView contentContainerStyle={styles.container}>
           <Text variant='headlineSmall'>Scanner</Text>
           <Text variant='bodyMedium' style={[styles.desc, { color: theme.colors.onSurfaceVariant }]}>

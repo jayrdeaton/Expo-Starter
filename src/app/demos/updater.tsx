@@ -1,10 +1,12 @@
 import { Button } from '@rific/feedback-press'
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
 import { useUpdater } from '@rific/updater'
-import { Stack, useRouter } from 'expo-router'
+import { Stack } from 'expo-router'
 import { useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { Chip, Divider, Surface, Text, useTheme } from 'react-native-paper'
+
+import { safeBack } from '@/utils/navigation'
 
 const INFO_ITEMS = [
   {
@@ -34,7 +36,6 @@ const INFO_ITEMS = [
 ]
 
 const UpdaterDemo = () => {
-  const router = useRouter()
   const theme = useTheme()
   const [info, setInfo] = useState<{ title: string; message: string } | null>(null)
   const { check, checking, updateReady } = useUpdater({
@@ -46,7 +47,7 @@ const UpdaterDemo = () => {
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
-        <ScrollViewHeader backAction={() => router.back()} title='Updater' caption='@rific/updater' />
+        <ScrollViewHeader backAction={safeBack} title='Updater' caption='@rific/updater' />
         <ScrollView contentContainerStyle={styles.container}>
           <Text variant='bodyMedium' style={[styles.desc, { color: theme.colors.onSurfaceVariant }]}>
             OTA update hook for Expo apps. Checks for updates on every foreground resume and prompts to restart as soon as one&apos;s found. Exposes a manual check function, an optional confirmation callback before applying the update, and (new in 0.4.0) an onInfo callback for check()&apos;s informational messages — pass autoPrompt: false to stage updates silently instead.

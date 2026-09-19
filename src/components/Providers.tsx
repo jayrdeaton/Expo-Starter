@@ -1,9 +1,10 @@
 import { Drawer } from '@rific/drawer'
-import { FeedbackPressProvider, hapticActions, type HapticSettings, soundActions, type SoundSettings } from '@rific/feedback-press'
+import { FeedbackPressProvider, hapticActions, type HapticSettings, soundActions, type SoundSettings, useFeedbackBridgeProps } from '@rific/feedback-press'
 import { scrollViewActions, type ScrollViewSettings, ScrollViewSettingsProvider } from '@rific/scroll-view'
-import { type HistoryContainerProps, HistoryModal, Toaster, ToastProvider } from '@rific/toaster'
+import { type HistoryContainerProps, HistoryModal, Toaster, ToastProvider, useUpdateErrorToast } from '@rific/toaster'
+import { useUpdater } from '@rific/updater'
 import * as Haptics from 'expo-haptics'
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useWindowDimensions } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { KeyboardProvider } from 'react-native-keyboard-controller'
@@ -35,11 +36,22 @@ const FeedbackBridge = ({ children }: ProvidersProps) => {
   const onChange = useCallback((s: HapticSettings) => dispatch(hapticActions.initialize(s)), [dispatch])
   const onSoundChange = useCallback((s: SoundSettings) => dispatch(soundActions.initialize(s)), [dispatch])
   const { playClick, playPop } = useDefaultSounds()
+  const soundConfig = useMemo(() => ({ selection: playClick, notification: playPop }), [playClick, playPop])
+  const bridgeProps = useFeedbackBridgeProps({ initialValue: haptic, onChange, soundInitialValue: sound, onSoundChange, sound: soundConfig })
   return (
-    <FeedbackPressProvider initialValue={haptic} onChange={onChange} paper={RNPaper} soundInitialValue={sound} onSoundChange={onSoundChange} sound={{ selection: playClick, notification: playPop }}>
+    <FeedbackPressProvider paper={RNPaper} {...bridgeProps}>
       {children}
     </FeedbackPressProvider>
   )
+}
+
+// Rendered inside ToastProvider (useUpdateErrorToast needs its context), which is why this lives
+// here and not in _layout.tsx above Providers: a failed update check surfaces as an error toast
+// instead of @rific/updater's default Alert.
+const UpdateChecker = () => {
+  const onError = useUpdateErrorToast()
+  useUpdater({ onError })
+  return null
 }
 
 const ScrollViewBridge = ({ children }: ProvidersProps) => {
@@ -64,6 +76,7 @@ export const Providers = ({ children }: ProvidersProps) => {
                 <KeyboardProvider>
                   <Theme>
                     <ToastProvider haptics={Haptics} paper={RNPaper}>
+                      <UpdateChecker />
                       {children}
                       <Toaster historyModal={<HistoryModal Container={HistoryDrawerContainer} />} />
                     </ToastProvider>

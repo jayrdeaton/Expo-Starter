@@ -1,17 +1,17 @@
 import { AppbarAction, Button, Card, Checkbox, Chip, FAB, IconButton, SegmentedButtons, Switch, useHapticSettings, useHoldToRepeat, useHoldToRepeatByKey, useSoundSettings, useVibration } from '@rific/feedback-press'
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
 import { NotificationFeedbackType } from 'expo-haptics'
-import { Stack, useRouter } from 'expo-router'
+import { Stack } from 'expo-router'
 import { useCallback, useRef, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { Divider, Text, useTheme } from 'react-native-paper'
 
 import { useFeedbackSounds } from '@/hooks/useFeedbackSounds'
+import { safeBack } from '@/utils/navigation'
 
 const HOLD_KEYS = ['A', 'B', 'C'] as const
 
 const FeedbackPressDemo = () => {
-  const router = useRouter()
   const theme = useTheme()
   const { settings: hapticSettings, set: setHapticSettings } = useHapticSettings()
   const { settings: soundSettings, set: setSoundSettings } = useSoundSettings()
@@ -80,7 +80,7 @@ const FeedbackPressDemo = () => {
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
-        <ScrollViewHeader backAction={() => router.back()} title='Feedback Press' caption='@rific/feedback-press' />
+        <ScrollViewHeader backAction={safeBack} title='Feedback Press' caption='@rific/feedback-press' />
         <ScrollView contentContainerStyle={styles.container}>
           <Text variant='bodyMedium' style={[styles.desc, { color: theme.colors.onSurfaceVariant }]}>
             Drop-in replacements for react-native-paper pressable components (Button, IconButton, TouchableRipple, Card, Chip, AppbarBackAction, AppbarAction, FAB, Checkbox, Switch, SegmentedButtons) that automatically fire expo-haptics on press, plus an app-supplied sound at the same instant. Enabled/disabled globally via FeedbackPressProvider.

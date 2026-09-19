@@ -1,11 +1,11 @@
 import { Chip, SegmentedButtons } from '@rific/feedback-press'
 import { CustomList, PullSearch, type PullSearchHandle, ScrollViewFooter, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
-import { useRouter } from 'expo-router'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { FlatList, StyleSheet, View } from 'react-native'
 import { Divider, Text, useTheme } from 'react-native-paper'
 import Animated from 'react-native-reanimated'
 
+import { safeBack } from '@/utils/navigation'
 import { timeout } from '@/utils/timeout'
 
 type Tab = 'fruits' | 'vegetables' | 'grains'
@@ -21,7 +21,6 @@ type Item = { key: string; name: string; isLast: boolean }
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList<Item>)
 
 const CustomListDemo = () => {
-  const router = useRouter()
   const theme = useTheme()
   const scrollRef = useRef(null)
   const searchRef = useRef<PullSearchHandle>(null)
@@ -92,7 +91,7 @@ const CustomListDemo = () => {
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
       <ScrollViewProvider>
-        <ScrollViewHeader backAction={() => router.back()} centerContent={centerContent} />
+        <ScrollViewHeader backAction={safeBack} centerContent={centerContent} />
         <CustomList component={AnimatedFlatList} data={data} keyExtractor={(item: Item) => item.key} ListHeaderComponent={listHeader} onRefresh={handleRefresh} pullSearchHeight={pullSearchHeight} renderItem={renderItem} scrollRef={scrollRef} />
         <ScrollViewFooter style={styles.footer}>
           <Text variant='labelMedium' style={{ color: theme.colors.onSurfaceVariant }}>

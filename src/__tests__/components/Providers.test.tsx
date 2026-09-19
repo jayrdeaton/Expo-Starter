@@ -4,10 +4,13 @@ import { Text } from 'react-native'
 import { Providers } from '../../components/Providers'
 
 const mockHapticProviderCalls: unknown[] = []
+const mockUseUpdater = jest.fn()
+const mockOnUpdateError = jest.fn()
 jest.mock('@rific/auto-paper', () => ({
   Provider: (props: any) => props.children,
   themeActions: { initialize: (payload: unknown) => ({ payload, type: 'theme/initialize' }) },
-  themeReducer: (state = { appearance: 'auto', blur: true, color: '#4caf50', harmony: 'split-complementary' }) => state
+  themeReducer: (state = { appearance: 'auto', blur: true, color: '#4caf50', harmony: 'split-complementary' }) => state,
+  useThemeBridgeProps: (props: unknown) => props
 }))
 
 jest.mock('@rific/feedback-press', () => ({
@@ -18,13 +21,19 @@ jest.mock('@rific/feedback-press', () => ({
     return props.children
   },
   hapticReducer: (state = { vibrate: true }) => state,
-  soundReducer: (state = { enabled: true }) => state
+  soundReducer: (state = { enabled: false }) => state,
+  useFeedbackBridgeProps: (props: unknown) => props
 }))
 
 jest.mock('@rific/toaster', () => ({
   HistoryModal: () => null,
   Toaster: () => null,
-  ToastProvider: (props: any) => props.children
+  ToastProvider: (props: any) => props.children,
+  useUpdateErrorToast: () => mockOnUpdateError
+}))
+
+jest.mock('@rific/updater', () => ({
+  useUpdater: (...args: unknown[]) => mockUseUpdater(...args)
 }))
 
 jest.mock('../../utils/splashGate', () => ({
@@ -34,6 +43,7 @@ jest.mock('../../utils/splashGate', () => ({
 
 beforeEach(() => {
   mockHapticProviderCalls.length = 0
+  mockUseUpdater.mockClear()
 })
 
 describe('Providers', () => {
@@ -66,9 +76,7 @@ describe('Providers', () => {
     expect(mockHapticProviderCalls[0]).toEqual(expect.objectContaining({ initialValue: expect.objectContaining({ vibrate: true }) }))
   })
 
-  it('passes enabled=false (dev default, no stored preference) sound settings to FeedbackPressProvider', async () => {
-    // store.ts defaults a never-persisted sound preference to !__DEV__, which is false in this
-    // Jest/dev environment, so local/Claude test runs stay muted; production defaults to true.
+  it('passes the persisted sound settings from the store to FeedbackPressProvider', async () => {
     await render(
       <Providers>
         <Text>child</Text>
@@ -76,5 +84,14 @@ describe('Providers', () => {
     )
     expect(mockHapticProviderCalls.length).toBeGreaterThan(0)
     expect(mockHapticProviderCalls[0]).toEqual(expect.objectContaining({ soundInitialValue: expect.objectContaining({ enabled: false }) }))
+  })
+
+  it("routes useUpdater's onError through the update-error toast instead of the default Alert", async () => {
+    await render(
+      <Providers>
+        <Text>child</Text>
+      </Providers>
+    )
+    expect(mockUseUpdater).toHaveBeenCalledWith({ onError: mockOnUpdateError })
   })
 })

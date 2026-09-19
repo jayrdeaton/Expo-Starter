@@ -1,7 +1,9 @@
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
-import { Stack, useRouter } from 'expo-router'
+import { Stack } from 'expo-router'
 import { Platform, StyleSheet, View } from 'react-native'
 import { Divider, Surface, Text, useTheme } from 'react-native-paper'
+
+import { safeBack } from '@/utils/navigation'
 
 const FEATURES = ['6 cell modes: solid, gradient, density, stacked, dots, priority', 'Load-ripple, today-pulse, and press-spring animations, enabled with a single animated prop', 'Heatmap.Timeline variant: zoomable horizontal time-series view', 'Heatmap.Scatter variant for raw data distribution', 'Custom color scale with thresholds', 'Day and month label rendering', 'Tooltip with custom render function, pluralized unit label out of the box', 'Custom cell renderer for full control over appearance', 'onDayPress handler with date and data payload', 'Dark / light color scheme support', 'Auto-scaling from data range', 'Infinite scroll with onEndReached, extend endDate to append more weeks', 'Multi-category segments array for stacked/dots/priority cell modes']
 
@@ -43,14 +45,13 @@ const data = [
 // distribution) are also exported for the same DataPoint[] shape`
 
 const HeatmapPage = () => {
-  const router = useRouter()
   const theme = useTheme()
 
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
-        <ScrollViewHeader backAction={() => router.back()} title='@rific/heatmap' />
+        <ScrollViewHeader backAction={safeBack} title='@rific/heatmap' />
         <ScrollView contentContainerStyle={styles.container}>
           <Text variant='headlineSmall'>Heatmap</Text>
           <Text variant='bodyMedium' style={[styles.desc, { color: theme.colors.onSurfaceVariant }]}>

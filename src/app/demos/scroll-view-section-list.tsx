@@ -1,9 +1,10 @@
 import { BlurView, useThemeSettings } from '@rific/auto-paper'
 import { PullSearch, type PullSearchHandle, ScrollViewFooter, ScrollViewHeader, ScrollViewProvider, SectionList } from '@rific/scroll-view'
-import { useRouter } from 'expo-router'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { Divider, Text, useTheme } from 'react-native-paper'
+
+import { safeBack } from '@/utils/navigation'
 
 type FoodItem = { key: string; name: string }
 type FoodSection = { title: string; data: FoodItem[] }
@@ -96,7 +97,6 @@ const ALL_SECTIONS: FoodSection[] = [
 ]
 
 const SectionListDemo = () => {
-  const router = useRouter()
   const theme = useTheme()
   const {
     settings: { blur }
@@ -146,7 +146,7 @@ const SectionListDemo = () => {
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
       <ScrollViewProvider>
-        <ScrollViewHeader backAction={() => router.back()} caption='@rific/scroll-view' title='Section List' />
+        <ScrollViewHeader backAction={safeBack} caption='@rific/scroll-view' title='Section List' />
         <SectionList keyExtractor={keyExtractor} ListHeaderComponent={pullSearch} pullSearchHeight={pullSearchHeight} renderItem={renderItem} renderSectionHeader={renderSectionHeader} sections={sections} stickySectionHeadersEnabled />
         <ScrollViewFooter style={styles.footer}>
           <Text variant='labelMedium' style={{ color: theme.colors.onSurfaceVariant }}>

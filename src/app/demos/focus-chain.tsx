@@ -1,10 +1,12 @@
 import { useFocusChain } from '@rific/focus-chain'
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
 import { useToast } from '@rific/toaster'
-import { Stack, useRouter } from 'expo-router'
+import { Stack } from 'expo-router'
 import { useCallback } from 'react'
 import { Keyboard, Platform, StyleSheet, View } from 'react-native'
 import { Divider, Surface, Text, TextInput, useTheme } from 'react-native-paper'
+
+import { safeBack } from '@/utils/navigation'
 
 const FEATURES = ['Single hook, no manual ref bookkeeping, no state, no useEffect', 'Works with any focusable component (TextInput, custom inputs)', 'No React Native dependency, works in plain React too (wire onSubmitEditing to the Enter key on DOM inputs)', 'Call order determines focus order, no indices to manage', 'onSubmitEditing auto-wired to advance to the next field', 'Last field in the chain can submit the form']
 
@@ -50,7 +52,6 @@ const MyForm = () => {
 }`
 
 const FocusChainDemo = () => {
-  const router = useRouter()
   const theme = useTheme()
   const register = useFocusChain()
   const { ref: firstRef, props: firstProps } = register()
@@ -67,7 +68,7 @@ const FocusChainDemo = () => {
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
-        <ScrollViewHeader backAction={() => router.back()} caption='@rific/focus-chain' title='Focus Chain' />
+        <ScrollViewHeader backAction={safeBack} caption='@rific/focus-chain' title='Focus Chain' />
         <ScrollView contentContainerStyle={styles.container} keyboardAware keyboardShouldPersistTaps='handled'>
           <Text variant='bodyMedium' style={[styles.desc, { color: theme.colors.onSurfaceVariant }]}>
             Auto-advancing focus chain for React form inputs, React Native or web. Call the hook once, spread the result onto each input in order, then pressing Next or Return automatically moves focus to the next field with no wiring required.

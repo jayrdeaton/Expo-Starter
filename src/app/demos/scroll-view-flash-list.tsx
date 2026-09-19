@@ -1,12 +1,12 @@
 import { Chip } from '@rific/feedback-press'
 import { CustomList, PullSearch, type PullSearchHandle, ScrollViewFooter, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
 import { FlashList } from '@shopify/flash-list'
-import { useRouter } from 'expo-router'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { Divider, Text, useTheme } from 'react-native-paper'
 import Animated from 'react-native-reanimated'
 
+import { safeBack } from '@/utils/navigation'
 import { timeout } from '@/utils/timeout'
 
 const ALL_ITEMS = ['Apple', 'Apricot', 'Artichoke', 'Asparagus', 'Avocado', 'Banana', 'Barley', 'Blackberry', 'Blueberry', 'Broccoli', 'Brown Rice', 'Buckwheat', 'Bulgur', 'Carrot', 'Cauliflower', 'Celery', 'Cherry', 'Coconut', 'Corn', 'Cranberry', 'Cucumber', 'Date', 'Dragon Fruit', 'Eggplant', 'Farro', 'Fig', 'Freekeh', 'Garlic', 'Ginger', 'Grape', 'Grapefruit', 'Guava', 'Kamut', 'Kale', 'Kiwi', 'Lemon', 'Lettuce', 'Lime', 'Lychee', 'Mango', 'Melon', 'Millet', 'Mushroom', 'Nectarine', 'Oats', 'Onion', 'Orange', 'Papaya', 'Passion Fruit', 'Peach', 'Pear', 'Pepper', 'Pineapple', 'Plum', 'Pomegranate', 'Potato', 'Pumpkin', 'Quinoa', 'Raspberry', 'Rye', 'Sorghum', 'Spelt', 'Spinach', 'Strawberry', 'Tangerine', 'Teff', 'Tomato', 'Watermelon', 'Wheat', 'White Rice', 'Wild Rice', 'Zucchini']
@@ -16,7 +16,6 @@ type Item = { key: string; name: string; isLast: boolean }
 const AnimatedFlashList = Animated.createAnimatedComponent(FlashList<Item>)
 
 const FlashListDemo = () => {
-  const router = useRouter()
   const theme = useTheme()
   const scrollRef = useRef(null)
   const searchRef = useRef<PullSearchHandle>(null)
@@ -69,7 +68,7 @@ const FlashListDemo = () => {
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
       <ScrollViewProvider>
-        <ScrollViewHeader backAction={() => router.back()} title='Flash List' />
+        <ScrollViewHeader backAction={safeBack} title='Flash List' />
         <CustomList component={AnimatedFlashList} data={data} keyExtractor={(item: Item) => item.key} ListHeaderComponent={listHeader} onRefresh={handleRefresh} pullSearchHeight={pullSearchHeight} renderItem={renderItem} scrollRef={scrollRef} />
         <ScrollViewFooter style={styles.footer}>
           <Text variant='labelMedium' style={{ color: theme.colors.onSurfaceVariant }}>

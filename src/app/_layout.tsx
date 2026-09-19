@@ -1,4 +1,3 @@
-import { useUpdater } from '@rific/updater'
 import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 
@@ -17,8 +16,6 @@ const RootNavigator = () => {
 }
 
 const RootLayout = () => {
-  useUpdater()
-
   return (
     <Providers>
       <RootNavigator />
