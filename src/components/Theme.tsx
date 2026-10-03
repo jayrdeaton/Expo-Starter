@@ -24,9 +24,11 @@ export const Theme = ({ children }: ThemeProps) => {
   // @expo/vector-icons doesn't preload: each Icon instance mounts blank and independently kicks
   // off its own Font.loadAsync, swapping in the real glyph only once that resolves. Loading it here
   // and marking the 'fonts' gate ready only once it resolves means every icon this app will ever
-  // show is already loaded by the time the splash lifts, instead of popping in a beat later.
-  const [fontsLoaded] = useFonts(MaterialCommunityIcons.font)
-  useSplashReady('fonts', fontsLoaded)
+  // show is already loaded by the time the splash lifts, instead of popping in a beat later. A
+  // failed load leaves fontsLoaded false for good, so an error marks the gate too, rather than
+  // stranding the app on the splash screen.
+  const [fontsLoaded, fontError] = useFonts(MaterialCommunityIcons.font)
+  useSplashReady('fonts', fontsLoaded || fontError != null)
 
   const bridgeProps = useThemeBridgeProps({ initialValue: settings, onChange, onReady })
 

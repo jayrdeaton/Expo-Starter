@@ -10,9 +10,9 @@ import { markSplashReady, useSplashReady } from '../../utils/splashGate'
 jest.mock('../../utils/splashGate', () => ({
   markSplashReady: jest.fn(),
   // A real (not mocked) useSplashReady would need a real createGate instance behind it.
-  // Theme's own 'fonts' gate is driven by useFonts below, which the mock in jest.setup.ts already
-  // resolves synchronously to `[true]`, so there's nothing useful this fake would add beyond not
-  // throwing when Theme calls it.
+  // Theme's own 'fonts' gate is driven by useFonts below, which src/__mocks__/expo-font.ts already
+  // resolves synchronously to `[true, null]`, so there's nothing useful this fake would add beyond
+  // not throwing when Theme calls it.
   useSplashReady: jest.fn()
 }))
 
@@ -107,8 +107,9 @@ describe('Theme', () => {
     expect(mockMarkSplashReady).toHaveBeenCalledWith('theme')
   })
 
-  // The icon font mock in jest.setup.ts resolves useFonts synchronously to [true]. See its own
-  // comment for why every react-native-paper icon in this app depends on that exact font.
+  // The icon font mock in src/__mocks__/expo-font.ts resolves useFonts synchronously to
+  // [true, null]. See Theme.tsx's own useFonts comment for why every react-native-paper icon in
+  // this app depends on that exact font.
   it("marks the 'fonts' splash gate ready once the icon font resolves", async () => {
     await render(
       <ReduxProvider store={makeStore()}>
@@ -118,5 +119,19 @@ describe('Theme', () => {
       </ReduxProvider>
     )
     expect(mockUseSplashReady).toHaveBeenCalledWith('fonts', true)
+  })
+
+  it("still marks the 'fonts' splash gate ready when the icon font fails to load", async () => {
+    const useFontsSpy = jest.spyOn(require('expo-font'), 'useFonts').mockReturnValue([false, new Error('font load failed')])
+    await render(
+      <ReduxProvider store={makeStore()}>
+        <Theme>
+          <Text>child</Text>
+        </Theme>
+      </ReduxProvider>
+    )
+    useFontsSpy.mockRestore()
+    expect(mockUseSplashReady).toHaveBeenCalledWith('fonts', true)
+    expect(mockUseSplashReady).not.toHaveBeenCalledWith('fonts', false)
   })
 })
