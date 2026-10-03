@@ -20,9 +20,6 @@
       "policy": "fingerprint"
     },
     "userInterfaceStyle": "automatic",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
     "icon": "./assets/images/dark-icon.png",
     "ios": {
       "supportsTablet": true,
@@ -37,17 +34,7 @@
       }
     },
     "android": {
-      "package": "com.infinitetoken.expostarter",
-      "permissions": [
-        "android.permission.RECORD_AUDIO",
-        "android.permission.MODIFY_AUDIO_SETTINGS",
-        "android.permission.FOREGROUND_SERVICE",
-        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
-        "android.permission.RECORD_AUDIO",
-        "android.permission.MODIFY_AUDIO_SETTINGS",
-        "android.permission.FOREGROUND_SERVICE",
-        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
-      ]
+      "package": "com.infinitetoken.expostarter"
     },
     "plugins": [
       "expo-router",
@@ -66,7 +53,14 @@
         }
       ],
       "expo-asset",
-      "expo-audio"
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false,
+          "enableBackgroundPlayback": false
+        }
+      ]
     ],
     "extra": {
       "router": {},
