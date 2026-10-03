@@ -24,17 +24,36 @@ describe('settingsSlice', () => {
     })
   })
 
-  describe('resetSettings', () => {
-    it('restores debug to false', () => {
-      const modified: SettingsState = { debug: true }
-      const state = settingsReducer(modified, settingsActions.resetSettings())
-      expect(state.debug).toBe(false)
+  describe('initialize', () => {
+    it('replaces the whole slice', () => {
+      const state = settingsReducer(defaultSettingsState, settingsActions.initialize({ debug: true }))
+      expect(state).toEqual({ debug: true })
     })
 
-    it('is idempotent', () => {
-      const once = settingsReducer(defaultSettingsState, settingsActions.resetSettings())
-      const twice = settingsReducer(once, settingsActions.resetSettings())
-      expect(twice).toEqual(defaultSettingsState)
+    it('resets to defaults when given defaultSettingsState', () => {
+      const modified: SettingsState = { debug: true }
+      const state = settingsReducer(modified, settingsActions.initialize(defaultSettingsState))
+      expect(state).toEqual(defaultSettingsState)
+    })
+  })
+
+  describe('REHYDRATE', () => {
+    it('backfills fields missing from an older persisted blob', () => {
+      const state = settingsReducer(undefined, { type: 'persist/REHYDRATE', payload: { settings: {} } } as never)
+      expect(state).toEqual(defaultSettingsState)
+    })
+
+    it('keeps the persisted values it does find', () => {
+      const state = settingsReducer(undefined, { type: 'persist/REHYDRATE', payload: { settings: { debug: true } } } as never)
+      expect(state.debug).toBe(true)
+    })
+
+    // redux-persist's default autoMergeLevel1 only hard-replaces a slice the reducer left untouched
+    // on REHYDRATE, so returning a new object is what lets the backfill above survive.
+    it('returns a new object, so redux-persist keeps the backfilled state', () => {
+      const before = settingsReducer(undefined, { type: '@@INIT' })
+      const after = settingsReducer(before, { type: 'persist/REHYDRATE', payload: { settings: {} } } as never)
+      expect(after).not.toBe(before)
     })
   })
 
@@ -45,9 +64,10 @@ describe('settingsSlice', () => {
       expect(action.payload).toBe(true)
     })
 
-    it('resetSettings creates action with correct type', () => {
-      const action = settingsActions.resetSettings()
-      expect(action.type).toBe('settings/resetSettings')
+    it('initialize creates action with correct type and payload', () => {
+      const action = settingsActions.initialize(defaultSettingsState)
+      expect(action.type).toBe('settings/initialize')
+      expect(action.payload).toEqual(defaultSettingsState)
     })
   })
 })
