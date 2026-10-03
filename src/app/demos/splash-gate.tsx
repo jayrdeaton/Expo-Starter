@@ -1,9 +1,8 @@
 import { Button, Chip } from '@rific/feedback-press'
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
 import { createGate } from '@rific/splash-gate'
-import { Stack } from 'expo-router'
 import { type ReactNode, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { Platform, StyleSheet, View } from 'react-native'
 import { ActivityIndicator, Divider, Icon, Surface, Text, useTheme } from 'react-native-paper'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 
@@ -91,7 +90,6 @@ const SplashGateDemo = () => {
 
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
-      <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
         <ScrollViewHeader backAction={safeBack} title='Splash Gate' caption='@rific/splash-gate' />
         <ScrollView contentContainerStyle={styles.container}>
@@ -218,7 +216,7 @@ const SplashGateDemo = () => {
 }
 
 const styles = StyleSheet.create({
-  code: { fontFamily: 'monospace' },
+  code: { fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
   container: { paddingHorizontal: 16, paddingTop: 16 },
   desc: { marginTop: 0 },
   divider: { marginVertical: 20 },

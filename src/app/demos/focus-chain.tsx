@@ -1,7 +1,6 @@
 import { useFocusChain } from '@rific/focus-chain'
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
 import { useToast } from '@rific/toaster'
-import { Stack } from 'expo-router'
 import { useCallback } from 'react'
 import { Keyboard, Platform, StyleSheet, View } from 'react-native'
 import { Divider, Surface, Text, TextInput, useTheme } from 'react-native-paper'
@@ -15,16 +14,23 @@ const API_ITEMS = [
   { name: 'register()', desc: 'Call once per input in order. Returns { ref, props }.' },
   { name: 'ref', desc: "Pass to the input's ref prop directly. Kept out of props so a callback-ref never gets mistaken for a reactive value under the React Compiler." },
   { name: 'props.onSubmitEditing', desc: 'Spread via props. Focuses the next registered input automatically.' },
+  { name: 'props.blurOnSubmit', desc: "Always false, so the keyboard stays up between fields. Dismiss it yourself in the last field's submit handler." },
   { name: 'props.focus()', desc: 'Imperatively focus this specific input from anywhere.' }
 ]
 
 const USAGE = `import { useFocusChain } from '@rific/focus-chain'
+import { Keyboard, TextInput } from 'react-native'
 
 const MyForm = () => {
   const register = useFocusChain()
   const first = register()
   const second = register()
   const third = register()
+
+  const handleSubmit = () => {
+    // blurOnSubmit is always false, so Done won't dismiss the keyboard by itself
+    Keyboard.dismiss()
+  }
 
   return (
     <>
@@ -66,12 +72,11 @@ const FocusChainDemo = () => {
 
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
-      <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
         <ScrollViewHeader backAction={safeBack} caption='@rific/focus-chain' title='Focus Chain' />
         <ScrollView contentContainerStyle={styles.container} keyboardAware keyboardShouldPersistTaps='handled'>
           <Text variant='bodyMedium' style={[styles.desc, { color: theme.colors.onSurfaceVariant }]}>
-            Auto-advancing focus chain for React form inputs, React Native or web. Call the hook once, spread the result onto each input in order, then pressing Next or Return automatically moves focus to the next field with no wiring required.
+            Auto-advancing focus chain for React form inputs, React Native or web. Call the hook once, then register() once per input in order: pass its ref and spread its props, and pressing Next or Return moves focus to the next field, with no index or ref bookkeeping.
           </Text>
 
           <Divider style={styles.divider} />

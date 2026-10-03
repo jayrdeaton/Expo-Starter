@@ -1,7 +1,7 @@
 import { useThemeSettings } from '@rific/auto-paper'
 import { AppbarAction, Button, Chip, Switch } from '@rific/feedback-press'
-import { PullSearch, type PullSearchHandle, ScrollView, ScrollViewFooter, ScrollViewHeader, ScrollViewProvider, useScrollView, useScrollViewSettings } from '@rific/scroll-view'
-import { Stack, useRouter } from 'expo-router'
+import { defaultScrollViewSettings, PullSearch, type PullSearchHandle, ScrollView, ScrollViewFooter, ScrollViewHeader, ScrollViewProvider, useScrollView, useScrollViewSettings } from '@rific/scroll-view'
+import { useRouter } from 'expo-router'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { Divider, Text, useTheme } from 'react-native-paper'
@@ -60,7 +60,7 @@ const ScrollViewDemo = () => {
   const [pullSearchHeight, setPullSearchHeight] = useState(0)
   const searchRef = useRef<PullSearchHandle>(null)
   const handleChangeText = useCallback(() => {}, [])
-  const pullSearch = useMemo(() => <PullSearch onChangeText={handleChangeText} onHeightChange={setPullSearchHeight} placeholder='Example pull search...' ref={searchRef} />, [handleChangeText])
+  const pullSearch = useMemo(() => <PullSearch onChangeText={handleChangeText} onHeightChange={setPullSearchHeight} placeholder='Example pull search…' ref={searchRef} />, [handleChangeText])
 
   const [fixed, setFixed] = useState(false)
   const [showCaption, setShowCaption] = useState(true)
@@ -70,9 +70,8 @@ const ScrollViewDemo = () => {
 
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
-      <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider fixed={fixed}>
-        <ScrollViewHeader actionSize={actionSize} backAction={safeBack} caption={showCaption ? '@rific/scroll-view' : undefined} title='Scroll View' trailingAction={showTrailing ? <AppbarAction icon={settings.headerFixed ? 'lock' : 'lock-open-outline'} onPress={() => set({ headerFixed: !settings.headerFixed })} /> : undefined} trailingActionFixed={trailingActionFixed} />
+        <ScrollViewHeader actionSize={actionSize} backAction={safeBack} caption={showCaption ? '@rific/scroll-view' : undefined} title='Scroll View' trailingAction={showTrailing ? <AppbarAction accessibilityLabel='Toggle header fixed' icon={settings.headerFixed ? 'lock' : 'lock-open-outline'} onPress={() => set({ headerFixed: !settings.headerFixed })} /> : undefined} trailingActionFixed={trailingActionFixed} />
         <ScrollView contentContainerStyle={styles.container} pullSearchHeight={pullSearchHeight}>
           {pullSearch}
 
@@ -82,26 +81,56 @@ const ScrollViewDemo = () => {
 
           <Divider style={styles.divider} />
           <Text variant='titleMedium' style={styles.sectionLabel}>
-            Header & Footer
+            App Settings
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-            When not fixed, the header and footer scroll away with the content.
+            App-wide and persisted: every scroll-view screen falls back to these, and they survive an app restart. Header fixed and Footer fixed dim while Both fixed (below) overrides them on this screen. Apart from Blur and the header&apos;s lock button, the rest of this screen&apos;s toggles only affect this screen.
           </Text>
-          <View style={styles.row}>
-            <Text variant='bodyMedium'>Both fixed</Text>
-            <Switch value={fixed} onValueChange={setFixed} />
-          </View>
           <View style={[styles.row, fixed && styles.dimmed]}>
             <Text variant='bodyMedium'>Header fixed</Text>
-            <Switch value={settings.headerFixed} onValueChange={(v) => set({ headerFixed: v })} disabled={fixed} />
+            <Switch accessibilityLabel='Header fixed' value={settings.headerFixed} onValueChange={(v) => set({ headerFixed: v })} disabled={fixed} />
           </View>
           <View style={[styles.row, fixed && styles.dimmed]}>
             <Text variant='bodyMedium'>Footer fixed</Text>
-            <Switch value={settings.footerFixed} onValueChange={(v) => set({ footerFixed: v })} disabled={fixed} />
+            <Switch accessibilityLabel='Footer fixed' value={settings.footerFixed} onValueChange={(v) => set({ footerFixed: v })} disabled={fixed} />
+          </View>
+          <View style={styles.row}>
+            <Text variant='bodyMedium'>Back fixed</Text>
+            <Switch accessibilityLabel='Back fixed' value={settings.backActionFixed} onValueChange={(v) => set({ backActionFixed: v })} />
+          </View>
+          <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
+            Snap back brings the header and/or footer back into view immediately on scroll up. Header only and Footer only turn it on for one side while Snap back (both) is off.
+          </Text>
+          <View style={styles.row}>
+            <Text variant='bodyMedium'>Snap back (both)</Text>
+            <Switch accessibilityLabel='Snap back (both)' value={settings.snapBack} onValueChange={(v) => set({ snapBack: v })} />
+          </View>
+          <View style={[styles.row, settings.snapBack && styles.dimmed]}>
+            <Text variant='bodyMedium'>Header only</Text>
+            <Switch accessibilityLabel='Header only' value={settings.snapBackHeader ?? false} onValueChange={(v) => set({ snapBackHeader: v || undefined })} disabled={settings.snapBack} />
+          </View>
+          <View style={[styles.row, settings.snapBack && styles.dimmed]}>
+            <Text variant='bodyMedium'>Footer only</Text>
+            <Switch accessibilityLabel='Footer only' value={settings.snapBackFooter ?? false} onValueChange={(v) => set({ snapBackFooter: v || undefined })} disabled={settings.snapBack} />
+          </View>
+          <Button mode='outlined' onPress={() => set({ ...defaultScrollViewSettings, snapBackFooter: undefined, snapBackHeader: undefined })}>
+            Reset to defaults
+          </Button>
+
+          <Divider style={styles.divider} />
+          <Text variant='titleMedium' style={styles.sectionLabel}>
+            Header & Footer
+          </Text>
+          <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
+            When not fixed, the header and footer scroll away with the content. Both fixed pins them on this screen only, overriding Header fixed and Footer fixed above.
+          </Text>
+          <View style={styles.row}>
+            <Text variant='bodyMedium'>Both fixed</Text>
+            <Switch accessibilityLabel='Both fixed' value={fixed} onValueChange={setFixed} />
           </View>
           <View style={styles.row}>
             <Text variant='bodyMedium'>Caption</Text>
-            <Switch value={showCaption} onValueChange={setShowCaption} />
+            <Switch accessibilityLabel='Caption' value={showCaption} onValueChange={setShowCaption} />
           </View>
           <Text variant='bodySmall' style={[styles.chipLabel, { color: theme.colors.onSurfaceVariant }]}>
             Action size
@@ -119,7 +148,7 @@ const ScrollViewDemo = () => {
             Blur
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-            {'Applies a blur backdrop to the header and footer chrome. Powered by '}
+            {'Applies a blur backdrop to the header and footer chrome on iOS and web (Android keeps the solid chrome). Powered by '}
             <Text variant='bodySmall' style={{ color: theme.colors.primary }} onPress={() => router.push('/demos/auto-paper')}>
               @rific/auto-paper
             </Text>
@@ -127,7 +156,7 @@ const ScrollViewDemo = () => {
           </Text>
           <View style={styles.row}>
             <Text variant='bodyMedium'>Blur enabled</Text>
-            <Switch value={blur} onValueChange={(v) => setTheme({ blur: v })} />
+            <Switch accessibilityLabel='Blur enabled' value={blur} onValueChange={(v) => setTheme({ blur: v })} />
           </View>
 
           <Divider style={styles.divider} />
@@ -135,39 +164,15 @@ const ScrollViewDemo = () => {
             Actions
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-            Back and trailing action slots. When not fixed, both scroll away with the header.
+            Back and trailing action slots. When not fixed, each scrolls away with the header (Back fixed is in App Settings above). The trailing slot here holds a lock that toggles the Header fixed app setting.
           </Text>
           <View style={styles.row}>
-            <Text variant='bodyMedium'>Back fixed</Text>
-            <Switch value={settings.backActionFixed} onValueChange={(v) => set({ backActionFixed: v })} />
-          </View>
-          <View style={styles.row}>
             <Text variant='bodyMedium'>Show trailing</Text>
-            <Switch value={showTrailing} onValueChange={setShowTrailing} />
+            <Switch accessibilityLabel='Show trailing' value={showTrailing} onValueChange={setShowTrailing} />
           </View>
           <View style={[styles.row, !showTrailing && styles.dimmed]}>
             <Text variant='bodyMedium'>Trailing fixed</Text>
-            <Switch value={trailingActionFixed} onValueChange={setTrailingActionFixed} disabled={!showTrailing} />
-          </View>
-
-          <Divider style={styles.divider} />
-          <Text variant='titleMedium' style={styles.sectionLabel}>
-            Snap Back
-          </Text>
-          <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-            Snaps the header and/or footer back into view immediately on scroll up. Individual overrides take precedence over both.
-          </Text>
-          <View style={styles.row}>
-            <Text variant='bodyMedium'>Snap back (both)</Text>
-            <Switch value={settings.snapBack} onValueChange={(v) => set({ snapBack: v })} />
-          </View>
-          <View style={[styles.row, settings.snapBack && styles.dimmed]}>
-            <Text variant='bodyMedium'>Header only</Text>
-            <Switch value={settings.snapBackHeader ?? false} onValueChange={(v) => set({ snapBackHeader: v || undefined })} disabled={settings.snapBack} />
-          </View>
-          <View style={[styles.row, settings.snapBack && styles.dimmed]}>
-            <Text variant='bodyMedium'>Footer only</Text>
-            <Switch value={settings.snapBackFooter ?? false} onValueChange={(v) => set({ snapBackFooter: v || undefined })} disabled={settings.snapBack} />
+            <Switch accessibilityLabel='Trailing fixed' value={trailingActionFixed} onValueChange={setTrailingActionFixed} disabled={!showTrailing} />
           </View>
 
           <Divider style={styles.divider} />
@@ -184,7 +189,7 @@ const ScrollViewDemo = () => {
             Pull Search
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-            Pull down past the header to reveal a search bar. Available in Flat List, Section List, and Custom List below.
+            Pull down past the header to reveal a search bar. Try it on this screen and in the Flat List, Section List, Custom List, Grid, and Flash List examples below. Pull-to-reveal is iOS-only; on Android and web the bar stays visible at the top of the list.
           </Text>
 
           <Divider style={styles.divider} />
@@ -236,7 +241,7 @@ const ScrollViewDemo = () => {
             Grid / Columns
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-            Toggles numColumns between a single-column list and a 3-column grid via a key remount, a repro bed for the header/offset remount bug.
+            Toggles numColumns between a single-column list and a 3-column grid at runtime. scroll-view&apos;s FlatList groups the items into rows itself and always hands React Native&apos;s FlatList a single column, so changing numColumns needs no key remount.
           </Text>
           <Button mode='outlined' onPress={() => router.push('/demos/scroll-view-grid')}>
             Open example
@@ -247,11 +252,7 @@ const ScrollViewDemo = () => {
             Flash List
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-            {'@shopify/flash-list via CustomList, same pull-to-search and blur chrome, virtualized with '}
-            <Text variant='bodySmall' style={styles.monospaceText}>
-              estimatedItemSize
-            </Text>
-            {'.'}
+            @shopify/flash-list v2 via CustomList, with the same pull-to-search and blur chrome. v2 measures items itself, so no item-size estimate is needed.
           </Text>
           <Button mode='outlined' onPress={() => router.push('/demos/scroll-view-flash-list')}>
             Open example
@@ -288,7 +289,6 @@ const styles = StyleSheet.create({
   fill: { flex: 1 },
   footer: { flex: 1, justifyContent: 'center' },
   hint: { marginBottom: 12 },
-  monospaceText: { fontFamily: 'monospace' },
   progressRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   row: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
   sectionLabel: { marginBottom: 8 }

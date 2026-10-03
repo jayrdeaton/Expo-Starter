@@ -1,7 +1,6 @@
 import { IconButton } from '@rific/feedback-press'
 import { ResizableInput, ResizableInputProvider } from '@rific/resizable-input'
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
-import { Stack } from 'expo-router'
 import { useState } from 'react'
 import { Platform, StyleSheet, View } from 'react-native'
 import { Divider, Surface, Text, TextInput as PaperTextInput, useTheme } from 'react-native-paper'
@@ -37,11 +36,17 @@ import { TextInput as PaperTextInput } from 'react-native-paper'
 
 // Auto-grows, Paper-styled by the configured default above
 <ResizableInput
-  mode="outlined"
-  label="Notes"
   placeholder="Start typing…"
   minHeight={80}
   maxHeight={300}
+/>
+
+// Paper-only props (mode, label) only typecheck when
+// TextInputComponent is passed explicitly
+<ResizableInput
+  TextInputComponent={PaperTextInput}
+  mode="outlined"
+  label="Notes"
 />
 
 // Override the default for one instance
@@ -64,10 +69,9 @@ const ResizableInputDemoContent = () => {
 
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
-      <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
         <ScrollViewHeader backAction={safeBack} title='Resizable Input' caption='@rific/resizable-input' />
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView contentContainerStyle={styles.container} keyboardAware keyboardShouldPersistTaps='handled'>
           <Text variant='bodyMedium' style={[styles.desc, { color: theme.colors.onSurfaceVariant }]}>
             Auto-growing, drag-resizable text input for React Native. Expands with content automatically and gives users a drag handle to resize manually. Works with any input component; this page configures it to default to react-native-paper&apos;s TextInput.
           </Text>
@@ -86,8 +90,8 @@ const ResizableInputDemoContent = () => {
                 minHeight: {minHeight}px
               </Text>
               <View style={styles.stepperRow}>
-                <IconButton icon='minus' mode='outlined' onPress={decreaseMinHeight} size={16} />
-                <IconButton icon='plus' mode='outlined' onPress={increaseMinHeight} size={16} />
+                <IconButton accessibilityLabel='Decrease minHeight' icon='minus' mode='outlined' onPress={decreaseMinHeight} size={16} />
+                <IconButton accessibilityLabel='Increase minHeight' icon='plus' mode='outlined' onPress={increaseMinHeight} size={16} />
               </View>
             </View>
             <View style={styles.heightControl}>
@@ -95,8 +99,8 @@ const ResizableInputDemoContent = () => {
                 maxHeight: {maxHeight}px
               </Text>
               <View style={styles.stepperRow}>
-                <IconButton icon='minus' mode='outlined' onPress={decreaseMaxHeight} size={16} />
-                <IconButton icon='plus' mode='outlined' onPress={increaseMaxHeight} size={16} />
+                <IconButton accessibilityLabel='Decrease maxHeight' icon='minus' mode='outlined' onPress={decreaseMaxHeight} size={16} />
+                <IconButton accessibilityLabel='Increase maxHeight' icon='plus' mode='outlined' onPress={increaseMaxHeight} size={16} />
               </View>
             </View>
           </View>

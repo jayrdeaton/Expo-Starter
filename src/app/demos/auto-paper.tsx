@@ -1,10 +1,10 @@
-import { AppearancePicker, AutoAppearancePicker, AutoPalettePicker, ColorPicker, Dialog, HarmonyPicker, Menu, PalettePicker, useAutoPaperTheme, useThemeSettings } from '@rific/auto-paper'
+import { AppearancePicker, AutoAppearancePicker, AutoPalettePicker, ColorPicker, Dialog, HarmonyPicker, Menu, PalettePicker, resolveSeedColor, useAutoPaperTheme, useThemeSettings } from '@rific/auto-paper'
 import { Button, Switch } from '@rific/feedback-press'
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
-import { Stack, useRouter } from 'expo-router'
+import { useRouter } from 'expo-router'
 import { useState } from 'react'
-import { StyleSheet, View } from 'react-native'
-import { Dialog as PaperDialog, Divider, Menu as PaperMenu, Surface, Text } from 'react-native-paper'
+import { Platform, StyleSheet, View } from 'react-native'
+import { Divider, Surface, Text } from 'react-native-paper'
 
 import { safeBack } from '@/utils/navigation'
 
@@ -21,14 +21,13 @@ const AutoPaperDemo = () => {
   const [dialogVisible, setDialogVisible] = useState(false)
   const [menuVisible, setMenuVisible] = useState(false)
 
-  // ColorPicker/PalettePicker only take a single seed string. This app's own settings screen
-  // never puts the global theme into explicit-triad mode, but `color` is typed for that
-  // possibility (see the Two-Color Theming demo below), so narrow it defensively here.
-  const seedColor = typeof color === 'string' ? color : color.primary
+  // ColorPicker/PalettePicker only take a single seed string. Nothing in this app puts the global
+  // theme into explicit-triad mode, but `color` is typed for that possibility (see the Two-Color
+  // Theming demo below), so narrow it defensively here.
+  const seedColor = resolveSeedColor(color)
 
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
-      <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
         <ScrollViewHeader backAction={safeBack} title='Auto Paper' caption='@rific/auto-paper' />
         <ScrollView contentContainerStyle={styles.container}>
@@ -67,7 +66,7 @@ const AutoPaperDemo = () => {
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
             Controls how secondary and tertiary colors are derived from the seed.
           </Text>
-          <HarmonyPicker value={harmony} onChange={(h) => set({ harmony: h })} />
+          <HarmonyPicker value={harmony} onChange={(h) => set({ harmony: h })} showLabels={false} />
 
           <Divider style={styles.divider} />
           <Text variant='titleMedium' style={styles.sectionLabel}>
@@ -96,11 +95,11 @@ const AutoPaperDemo = () => {
             Blur Mode
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-            Dialog and Menu components support a blur backdrop. Toggle to compare.
+            Dialog and Menu can render their surface as a frosted blur instead of a solid fill. Toggle to compare (iOS and web: Android always renders the solid fill, since expo-blur only blurs there with a blurTarget, which Dialog and Menu don&apos;t take).
           </Text>
           <View style={styles.blurRow}>
             <Text variant='bodyMedium'>Blur enabled</Text>
-            <Switch value={blur} onValueChange={(v) => set({ blur: v })} />
+            <Switch accessibilityLabel='Blur enabled' value={blur} onValueChange={(v) => set({ blur: v })} />
           </View>
           <View style={styles.blurButtons}>
             <Button mode='outlined' onPress={() => setDialogVisible(true)}>
@@ -115,19 +114,19 @@ const AutoPaperDemo = () => {
                 </Button>
               }
             >
-              <PaperMenu.Item onPress={() => setMenuVisible(false)} title='Option A' />
-              <PaperMenu.Item onPress={() => setMenuVisible(false)} title='Option B' />
-              <PaperMenu.Item onPress={() => setMenuVisible(false)} title='Option C' />
+              <Menu.Item onPress={() => setMenuVisible(false)} title='Option A' />
+              <Menu.Item onPress={() => setMenuVisible(false)} title='Option B' />
+              <Menu.Item onPress={() => setMenuVisible(false)} title='Option C' />
             </Menu>
           </View>
           <Dialog visible={dialogVisible} onDismiss={() => setDialogVisible(false)}>
-            <PaperDialog.Title>{`Blur ${blur ? 'On' : 'Off'}`}</PaperDialog.Title>
-            <PaperDialog.Content>
-              <Text variant='bodyMedium'>{`This dialog is rendered ${blur ? 'with' : 'without'} the blur backdrop.`}</Text>
-            </PaperDialog.Content>
-            <PaperDialog.Actions>
+            <Dialog.Title>{`Blur ${blur ? 'On' : 'Off'}`}</Dialog.Title>
+            <Dialog.Content>
+              <Text variant='bodyMedium'>{`This dialog's surface is rendered ${blur ? 'with' : 'without'} blur.`}</Text>
+            </Dialog.Content>
+            <Dialog.Actions>
               <Button onPress={() => setDialogVisible(false)}>Close</Button>
-            </PaperDialog.Actions>
+            </Dialog.Actions>
           </Dialog>
 
           <Divider style={styles.divider} />
@@ -308,7 +307,7 @@ const AutoPaperDemo = () => {
 const styles = StyleSheet.create({
   autoPickerCol: { alignItems: 'flex-start', gap: 8 },
   autoPickerLabel: { marginBottom: 0 },
-  autoPickersRow: { flexDirection: 'row', gap: 32 },
+  autoPickersRow: { columnGap: 32, flexDirection: 'row', flexWrap: 'wrap', rowGap: 16 },
   blurButtons: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   blurRow: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 },
   colorDot: { borderRadius: 12, height: 24, width: 24 },
@@ -318,7 +317,7 @@ const styles = StyleSheet.create({
   divider: { marginVertical: 20 },
   fill: { flex: 1 },
   hint: { marginBottom: 12 },
-  monospaceText: { fontFamily: 'monospace' },
+  monospaceText: { fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
   palette: { flexDirection: 'row', gap: 8 },
   paletteChip: { alignItems: 'center', borderRadius: 10, flex: 1, padding: 12 },
   paletteHex: { marginTop: 4 },

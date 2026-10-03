@@ -1,6 +1,6 @@
 import { Button, Card } from '@rific/feedback-press'
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
-import { Stack, useRouter } from 'expo-router'
+import { useRouter } from 'expo-router'
 import { StyleSheet, View } from 'react-native'
 import { Avatar, Divider, Text, useTheme } from 'react-native-paper'
 
@@ -12,20 +12,23 @@ type PackageEntry = {
   route: string
 }
 
+// @rific/core leads the list, ahead of the alphabetical order everything else follows: five of the
+// installed packages below (plus the optional scanner) require it as a peer, so it reads as the
+// baseline rather than one more entry.
 const INSTALLED: PackageEntry[] = [
+  {
+    name: 'core',
+    label: '@rific/core',
+    icon: 'cube-outline',
+    description: 'The shared foundation: settings context & Redux slice factories, module config, safeBack',
+    route: '/demos/core'
+  },
   {
     name: 'auto-paper',
     label: '@rific/auto-paper',
     icon: 'palette-outline',
     description: 'Adaptive Material 3 theming from a seed color',
     route: '/demos/auto-paper'
-  },
-  {
-    name: 'focus-chain',
-    label: '@rific/focus-chain',
-    icon: 'link-variant',
-    description: 'Auto-advancing focus chain for form inputs',
-    route: '/demos/focus-chain'
   },
   {
     name: 'drawer',
@@ -42,11 +45,32 @@ const INSTALLED: PackageEntry[] = [
     route: '/demos/feedback-press'
   },
   {
+    name: 'focus-chain',
+    label: '@rific/focus-chain',
+    icon: 'link-variant',
+    description: 'Auto-advancing focus chain for form inputs',
+    route: '/demos/focus-chain'
+  },
+  {
+    name: 'resizable-input',
+    label: '@rific/resizable-input',
+    icon: 'resize',
+    description: 'Auto-growing, drag-resizable text input',
+    route: '/demos/resizable-input'
+  },
+  {
     name: 'scroll-view',
     label: '@rific/scroll-view',
     icon: 'layers-outline',
-    description: 'Floating blur headers, footers, keyboard-aware scroll, and FAB',
+    description: 'Floating blur headers, footers, and keyboard-aware scroll',
     route: '/demos/scroll-view'
+  },
+  {
+    name: 'splash-gate',
+    label: '@rific/splash-gate',
+    icon: 'rocket-launch-outline',
+    description: 'Named-condition splash screen gating for Expo apps',
+    route: '/demos/splash-gate'
   },
   {
     name: 'toaster',
@@ -59,22 +83,8 @@ const INSTALLED: PackageEntry[] = [
     name: 'updater',
     label: '@rific/updater',
     icon: 'refresh',
-    description: 'Silent OTA update hook for Expo apps',
+    description: 'OTA update hook: checks on launch & resume, confirms before reloading',
     route: '/demos/updater'
-  },
-  {
-    name: 'splash-gate',
-    label: '@rific/splash-gate',
-    icon: 'rocket-launch-outline',
-    description: 'Named-condition splash screen gating for Expo apps',
-    route: '/demos/splash-gate'
-  },
-  {
-    name: 'resizable-input',
-    label: '@rific/resizable-input',
-    icon: 'resize',
-    description: 'Auto-growing, drag-resizable text input',
-    route: '/demos/resizable-input'
   }
 ]
 
@@ -102,12 +112,12 @@ const OPTIONAL: PackageEntry[] = [
   }
 ]
 
-type PackageCardProps = { pkg: PackageEntry; mode: 'elevated' | 'outlined'; cta: string }
+type PackageCardProps = { pkg: PackageEntry; cta: string }
 
-const PackageCard = ({ pkg, mode, cta }: PackageCardProps) => {
+const PackageCard = ({ pkg, cta }: PackageCardProps) => {
   const router = useRouter()
   return (
-    <Card mode={mode} style={styles.card} onPress={() => router.push(pkg.route)}>
+    <Card mode='elevated' style={styles.card} onPress={() => router.push(pkg.route)}>
       <Card.Title title={pkg.label} titleVariant='labelLarge' subtitle={pkg.description} subtitleNumberOfLines={2} left={(props) => <Avatar.Icon {...props} icon={pkg.icon} size={40} />} />
       <Card.Actions>
         <Button compact onPress={() => router.push(pkg.route)}>
@@ -122,7 +132,6 @@ const HomeScreen = () => {
   const theme = useTheme()
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
-      <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
         <ScrollViewHeader title='Expo Starter' />
         <ScrollView contentContainerStyle={styles.container}>
@@ -134,7 +143,7 @@ const HomeScreen = () => {
             Included Packages
           </Text>
           {INSTALLED.map((pkg) => (
-            <PackageCard key={pkg.name} pkg={pkg} mode='elevated' cta='View Demo' />
+            <PackageCard key={pkg.name} pkg={pkg} cta='View Demo' />
           ))}
 
           <Divider style={styles.divider} />
@@ -146,7 +155,7 @@ const HomeScreen = () => {
             </Text>
           </View>
           {OPTIONAL.map((pkg) => (
-            <PackageCard key={pkg.name} pkg={pkg} mode='elevated' cta='Learn More' />
+            <PackageCard key={pkg.name} pkg={pkg} cta='Learn More' />
           ))}
         </ScrollView>
       </ScrollViewProvider>

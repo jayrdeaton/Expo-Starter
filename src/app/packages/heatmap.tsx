@@ -1,5 +1,4 @@
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
-import { Stack } from 'expo-router'
 import { Platform, StyleSheet, View } from 'react-native'
 import { Divider, Surface, Text, useTheme } from 'react-native-paper'
 
@@ -11,7 +10,7 @@ const PROPS = [
   { name: 'data', type: 'DataPoint[]', desc: 'Required. Array of { date, value, color?, segments?, metadata? }; date is YYYY-MM-DD.' },
   { name: 'startDate / endDate', type: 'Date', desc: 'Range shown on the grid. Default: 1 year ago through today.' },
   { name: 'cellMode', type: 'CellMode', desc: '"solid" | "gradient" | "density" | "stacked" | "dots" | "priority". Default: "solid".' },
-  { name: 'colorScale', type: 'Partial<ColorScale>', desc: 'Thresholds and colors used to shade cells. Default: GitHub greens.' },
+  { name: 'colorScale', type: 'Partial<ColorScale>', desc: 'Thresholds and colors used to shade cells. Default: a 5-step blue scale (#4183c4 light / #58a6ff dark), generated from color when set.' },
   { name: 'color', type: 'string', desc: 'Single accent color, overrides the default color scale.' },
   { name: 'colorScheme', type: '"light" | "dark"', desc: 'Switch between built-in light and dark palettes.' },
   { name: 'autoScale', type: 'boolean', desc: 'Scale cell intensity relative to the max value in data. Default: true.' },
@@ -41,15 +40,15 @@ const data = [
   onDayPress={(point, date) => console.log(date, point?.value)}
 />
 
-// Heatmap.Timeline (zoomable time-series) and Heatmap.Scatter (raw
-// distribution) are also exported for the same DataPoint[] shape`
+// Heatmap.Scatter (raw distribution) takes the same DataPoint[];
+// Heatmap.Timeline (zoomable time-series) takes { timestamp, value }[]
+// (TimelineDataPoint)`
 
 const HeatmapPage = () => {
   const theme = useTheme()
 
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
-      <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
         <ScrollViewHeader backAction={safeBack} title='@rific/heatmap' />
         <ScrollView contentContainerStyle={styles.container}>
@@ -59,7 +58,7 @@ const HeatmapPage = () => {
           </Text>
 
           <Surface style={[styles.installBox, { backgroundColor: theme.colors.surfaceVariant }]} elevation={0}>
-            <Text style={[styles.code, { color: theme.colors.onSurfaceVariant }]}>npm install @rific/heatmap react-native-svg</Text>
+            <Text style={[styles.code, { color: theme.colors.onSurfaceVariant }]}>npx expo install @rific/heatmap react-native-svg</Text>
           </Surface>
 
           <Divider style={styles.divider} />
@@ -127,7 +126,7 @@ const styles = StyleSheet.create({
   fill: { flex: 1 },
   installBox: { borderRadius: 8, marginTop: 16, padding: 12 },
   propDesc: { marginTop: 2 },
-  propRow: { alignItems: 'center', flexDirection: 'row' },
+  propRow: { alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap' },
   propType: { marginLeft: 8 },
   sectionLabel: { marginBottom: 12 }
 })

@@ -1,8 +1,7 @@
 import { ColorPicker, getThirdColor, useComputedTheme, useThemeSettings } from '@rific/auto-paper'
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
-import { Stack } from 'expo-router'
 import { useMemo, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { Platform, StyleSheet, View } from 'react-native'
 import { Divider, Provider as PaperProvider, Surface, Text, useTheme } from 'react-native-paper'
 
 import { safeBack } from '@/utils/navigation'
@@ -70,7 +69,6 @@ const TwoColorDemo = () => {
 
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
-      <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
         <ScrollViewHeader backAction={safeBack} title='Two-Color Theming' caption='@rific/auto-paper' />
         <ScrollView contentContainerStyle={styles.container}>
@@ -132,7 +130,7 @@ const styles = StyleSheet.create({
   fill: { flex: 1 },
   hint: { marginBottom: 12 },
   matchSurface: { backgroundColor: 'transparent', gap: 16 },
-  monospaceText: { fontFamily: 'monospace' },
+  monospaceText: { fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
   palette: { flexDirection: 'row', gap: 8, marginTop: 16 },
   paletteChip: { alignItems: 'center', borderRadius: 10, flex: 1, padding: 12 },
   paletteHex: { marginTop: 4 },
