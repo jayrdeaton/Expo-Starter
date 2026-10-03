@@ -1,12 +1,13 @@
 import { FeedbackPressProvider } from '@rific/feedback-press'
-import { render } from '@testing-library/react-native'
+import { fireEvent, render } from '@testing-library/react-native'
 import * as RNPaper from 'react-native-paper'
 
 import HomeScreen from '../../app/(tabs)/index'
 
+const mockPush = jest.fn()
+
 jest.mock('expo-router', () => ({
-  Stack: { Screen: () => null },
-  useRouter: () => ({ back: jest.fn(), push: jest.fn() })
+  useRouter: () => ({ back: jest.fn(), push: mockPush })
 }))
 
 // react-native-paper is no longer auto-detected via require() inside @rific/feedback-press's
@@ -14,10 +15,14 @@ jest.mock('expo-router', () => ({
 // app wires it in src/components/Providers.tsx.
 const renderHomeScreen = () =>
   render(
-    <FeedbackPressProvider paper={RNPaper as unknown as Parameters<typeof FeedbackPressProvider>[0]['paper']}>
+    <FeedbackPressProvider paper={RNPaper}>
       <HomeScreen />
     </FeedbackPressProvider>
   )
+
+beforeEach(() => {
+  mockPush.mockClear()
+})
 
 describe('HomeScreen', () => {
   it('renders without crashing', async () => {
@@ -27,5 +32,15 @@ describe('HomeScreen', () => {
   it('displays the Expo Starter header', async () => {
     const { getByText } = await renderHomeScreen()
     expect(getByText('Expo Starter')).toBeTruthy()
+  })
+
+  it('every card button pushes a distinct route, @rific/core first', async () => {
+    const { getAllByText } = await renderHomeScreen()
+    const buttons = [...getAllByText('View Demo'), ...getAllByText('Learn More')]
+    for (const button of buttons) await fireEvent.press(button)
+    const routes = mockPush.mock.calls.map(([route]) => route)
+    expect(routes).toHaveLength(buttons.length)
+    expect(new Set(routes).size).toBe(routes.length)
+    expect(routes[0]).toBe('/demos/core')
   })
 })
