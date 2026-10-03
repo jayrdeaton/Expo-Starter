@@ -26,13 +26,16 @@ const KeyboardDemo = () => {
             </Text>
           )}
 
-          <View style={styles.row}>
+          <View style={[styles.row, footerAboveKeyboard && styles.dimmed]}>
             <Text variant='bodyMedium'>Keyboard aware</Text>
-            <Switch value={keyboardAware} onValueChange={setKeyboardAware} />
+            <Switch accessibilityLabel='Keyboard aware' value={keyboardAware} onValueChange={setKeyboardAware} disabled={footerAboveKeyboard} />
           </View>
+          <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
+            Has no effect while Footer above keyboard is on, since the floating footer already reserves the keyboard height.
+          </Text>
           <View style={styles.row}>
             <Text variant='bodyMedium'>Footer above keyboard</Text>
-            <Switch value={footerAboveKeyboard} onValueChange={setFooterAboveKeyboard} />
+            <Switch accessibilityLabel='Footer above keyboard' value={footerAboveKeyboard} onValueChange={setFooterAboveKeyboard} />
           </View>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
             The footer below holds Cancel and Done. With this on, the fixed footer floats above the keyboard instead of getting covered by it, so these stay reachable without dismissing the keyboard first. Pressing either one blurs the focused field, so the keyboard animates away.
@@ -68,6 +71,7 @@ const KeyboardDemo = () => {
 const styles = StyleSheet.create({
   container: { paddingHorizontal: 16 },
   desc: { marginTop: 16 },
+  dimmed: { opacity: 0.4 },
   fill: { flex: 1 },
   footer: { justifyContent: 'space-between', paddingHorizontal: 16 },
   hint: { marginBottom: 8, marginTop: 4 },

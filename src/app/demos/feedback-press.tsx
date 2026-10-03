@@ -1,7 +1,6 @@
 import { AppbarAction, Button, Card, Checkbox, Chip, FAB, IconButton, SegmentedButtons, Switch, useHapticSettings, useHoldToRepeat, useHoldToRepeatByKey, useSoundSettings, useVibration } from '@rific/feedback-press'
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
 import { NotificationFeedbackType } from 'expo-haptics'
-import { Stack } from 'expo-router'
 import { useCallback, useRef, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { Divider, Text, useTheme } from 'react-native-paper'
@@ -54,11 +53,14 @@ const FeedbackPressDemo = () => {
   // Measures how long each button was held before release, to make exclusive's click-on-release
   // delay visible rather than just audible/felt: Default's click fires at onPressIn (~0ms into the
   // hold, always), Exclusive's fires at onPressOut (however long the hold lasted), so the held
-  // duration IS the extra delay exclusive introduces for a press that never escalates.
+  // duration IS the extra delay exclusive introduces for a press that never escalates. A press that
+  // does escalate fires no click at all, so Exclusive's onLongPress flags it for the label instead.
   const [defaultHeldMs, setDefaultHeldMs] = useState<number | null>(null)
   const [exclusiveHeldMs, setExclusiveHeldMs] = useState<number | null>(null)
+  const [exclusiveEscalated, setExclusiveEscalated] = useState(false)
   const defaultPressStart = useRef<number | null>(null)
   const exclusivePressStart = useRef<number | null>(null)
+  const exclusiveLongPressed = useRef(false)
   const handleDefaultPressIn = useCallback(() => {
     defaultPressStart.current = Date.now()
   }, [])
@@ -69,16 +71,20 @@ const FeedbackPressDemo = () => {
   }, [])
   const handleExclusivePressIn = useCallback(() => {
     exclusivePressStart.current = Date.now()
+    exclusiveLongPressed.current = false
+  }, [])
+  const handleExclusiveLongPress = useCallback(() => {
+    exclusiveLongPressed.current = true
   }, [])
   const handleExclusivePressOut = useCallback(() => {
     if (exclusivePressStart.current == null) return
     setExclusiveHeldMs(Date.now() - exclusivePressStart.current)
+    setExclusiveEscalated(exclusiveLongPressed.current)
     exclusivePressStart.current = null
   }, [])
 
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
-      <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
         <ScrollViewHeader backAction={safeBack} title='Feedback Press' caption='@rific/feedback-press' />
         <ScrollView contentContainerStyle={styles.container}>
@@ -95,11 +101,11 @@ const FeedbackPressDemo = () => {
           </Text>
           <View style={styles.settingRow}>
             <Text variant='bodyMedium'>Haptics</Text>
-            <Switch value={hapticSettings.vibrate} onValueChange={(v) => setHapticSettings({ vibrate: v })} />
+            <Switch accessibilityLabel='Haptics' value={hapticSettings.vibrate} onValueChange={(v) => setHapticSettings({ vibrate: v })} />
           </View>
           <View style={styles.settingRow}>
             <Text variant='bodyMedium'>Sound</Text>
-            <Switch value={soundSettings.enabled} onValueChange={(v) => setSoundSettings({ enabled: v })} />
+            <Switch accessibilityLabel='Sound' value={soundSettings.enabled} onValueChange={(v) => setSoundSettings({ enabled: v })} />
           </View>
 
           <Divider style={styles.divider} />
@@ -107,7 +113,7 @@ const FeedbackPressDemo = () => {
             Haptic Types
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-            Tap to feel each vibration pattern.
+            Tap to feel each vibration pattern. These use useVibration&apos;s force* variants, so they fire even with the Haptics switch above off — the Notification Types below respect it.
           </Text>
           <View style={styles.row}>
             {[
@@ -116,7 +122,7 @@ const FeedbackPressDemo = () => {
               { label: 'Long', fn: () => vibration.forceLong() },
               { label: 'Double', fn: () => vibration.forceDouble() }
             ].map((h) => (
-              <Button key={h.label} mode='outlined' onPress={h.fn} compact>
+              <Button key={h.label} mode='outlined' hapticDisabled soundDisabled onPress={h.fn} compact>
                 {h.label}
               </Button>
             ))}
@@ -132,7 +138,7 @@ const FeedbackPressDemo = () => {
               { label: 'Warning', fn: () => vibration.notification(NotificationFeedbackType.Warning) },
               { label: 'Error', fn: () => vibration.notification(NotificationFeedbackType.Error) }
             ].map((h) => (
-              <Button key={h.label} mode='contained' onPress={h.fn} compact>
+              <Button key={h.label} mode='contained' hapticDisabled soundDisabled onPress={h.fn} compact>
                 {h.label}
               </Button>
             ))}
@@ -176,11 +182,11 @@ const FeedbackPressDemo = () => {
               </Text>
             </View>
             <View style={styles.compareItem}>
-              <Button mode='outlined' exclusive onPress={() => {}} onLongPress={() => {}} onPressIn={handleExclusivePressIn} onPressOut={handleExclusivePressOut} delayLongPress={400}>
+              <Button mode='outlined' exclusive onPress={() => {}} onLongPress={handleExclusiveLongPress} onPressIn={handleExclusivePressIn} onPressOut={handleExclusivePressOut} delayLongPress={400}>
                 Exclusive
               </Button>
               <Text variant='bodySmall' style={{ color: theme.colors.onSurfaceVariant }}>
-                held {exclusiveHeldMs ?? '—'}ms · click at ~{exclusiveHeldMs ?? '—'}ms
+                held {exclusiveHeldMs ?? '—'}ms · {exclusiveEscalated ? 'no click, pop instead' : `click at ~${exclusiveHeldMs ?? '—'}ms`}
               </Text>
             </View>
           </View>
@@ -236,19 +242,19 @@ const FeedbackPressDemo = () => {
           </Card>
 
           <View style={styles.fabRow}>
-            <FAB icon='plus' size='small' onPress={() => {}} />
-            <FAB icon='check' size='small' mode='flat' onPress={() => {}} />
-            <FAB icon='heart' size='small' mode='elevated' onPress={() => {}} />
+            <FAB icon='plus' accessibilityLabel='Add' size='small' onPress={() => {}} />
+            <FAB icon='check' accessibilityLabel='Confirm' size='small' mode='flat' onPress={() => {}} />
+            <FAB icon='heart' accessibilityLabel='Favorite' size='small' mode='elevated' onPress={() => {}} />
           </View>
 
           <View style={[styles.row, styles.item]}>
-            <IconButton icon='star-outline' onPress={() => {}} />
-            <AppbarAction icon='dots-vertical' onPress={() => {}} />
+            <IconButton icon='star-outline' accessibilityLabel='Star' onPress={() => {}} />
+            <AppbarAction icon='dots-vertical' accessibilityLabel='More options' onPress={() => {}} />
           </View>
 
           <View style={[styles.row, styles.item]}>
             <Checkbox status={checked ? 'checked' : 'unchecked'} onPress={() => setChecked((c) => !c)} />
-            <Switch value={switchOn} onValueChange={setSwitchOn} />
+            <Switch accessibilityLabel='Example switch' value={switchOn} onValueChange={setSwitchOn} />
           </View>
 
           <SegmentedButtons
@@ -270,11 +276,11 @@ const FeedbackPressDemo = () => {
             useHoldToRepeat fires an action immediately once you&apos;ve held past delayLongPress, then again every 400ms for as long as you keep holding — with a haptic + sound pulse on every tick, not just the first. Release to stop instantly. Press and hold, don&apos;t tap.
           </Text>
           <View style={styles.holdRow}>
-            <FAB icon='minus' size='small' onLongPress={decrementHold.onLongPress} onPressOut={decrementHold.onPressOut} delayLongPress={400} />
+            <FAB icon='minus' accessibilityLabel='Hold to decrement' size='small' onLongPress={decrementHold.onLongPress} onPressOut={decrementHold.onPressOut} delayLongPress={400} />
             <Text variant='headlineSmall' style={styles.holdCount}>
               {count}
             </Text>
-            <FAB icon='plus' size='small' onLongPress={incrementHold.onLongPress} onPressOut={incrementHold.onPressOut} delayLongPress={400} />
+            <FAB icon='plus' accessibilityLabel='Hold to increment' size='small' onLongPress={incrementHold.onLongPress} onPressOut={incrementHold.onPressOut} delayLongPress={400} />
           </View>
 
           <Text variant='titleMedium' style={[styles.sectionLabel, styles.item]}>
@@ -289,7 +295,7 @@ const FeedbackPressDemo = () => {
                 <Text variant='labelLarge'>
                   {key}: {keyedCounts[key] ?? 0}
                 </Text>
-                <FAB icon='plus' size='small' onLongPress={keyedHold.onLongPress(key)} onPressOut={keyedHold.onPressOut(key)} delayLongPress={400} />
+                <FAB icon='plus' accessibilityLabel={`Hold to increment ${key}`} size='small' onLongPress={keyedHold.onLongPress(key)} onPressOut={keyedHold.onPressOut(key)} delayLongPress={400} />
               </View>
             ))}
           </View>

@@ -1,7 +1,6 @@
 import { Button } from '@rific/feedback-press'
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
 import { LEVEL_COLORS, useToast } from '@rific/toaster'
-import { Stack } from 'expo-router'
 import { StyleSheet, View } from 'react-native'
 import { Divider, Text, useTheme } from 'react-native-paper'
 
@@ -13,7 +12,6 @@ const ToasterDemo = () => {
 
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
-      <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
         <ScrollViewHeader backAction={safeBack} title='Toaster' caption='@rific/toaster' />
         <ScrollView contentContainerStyle={styles.container}>
@@ -64,7 +62,7 @@ const ToasterDemo = () => {
             Stack Demo
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-            Fire multiple toasts quickly to see them stack and queue.
+            Fire multiple toasts quickly to see them stack, up to 3 visible at once (the Toaster&apos;s default limit).
           </Text>
           <Button
             mode='contained'
@@ -113,7 +111,7 @@ const ToasterDemo = () => {
             History
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-            All dismissed toasts are kept in a history stack accessible via a bottom drawer.
+            Every toast is logged to a history stack as it fires (the 100 most recent), accessible via a bottom drawer.
           </Text>
           <View style={styles.row}>
             <Button mode='outlined' icon='history' onPress={toast.openHistory}>

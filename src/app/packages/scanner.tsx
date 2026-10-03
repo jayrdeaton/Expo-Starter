@@ -1,27 +1,20 @@
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
-import { Stack } from 'expo-router'
 import { Platform, StyleSheet, View } from 'react-native'
 import { Divider, Surface, Text, useTheme } from 'react-native-paper'
 
 import { safeBack } from '@/utils/navigation'
 
-const FEATURES = ['Full-screen camera view with animated scan overlay', 'Bounds component draws a highlighted rectangle around detected barcodes', 'TimerRing shows a countdown ring when a scan timeout is configured', 'Pinch-to-zoom with configurable min/max zoom range', 'Scan deduplication, so onScan fires once per unique code per session', 'useScanOverlays hook for building custom animated feedback', 'Photo capture with configurable quality and base64 output', 'Multi-barcode support, detects all codes in frame simultaneously', 'configureScanner()/ScannerProvider set expo-camera, react-native-paper, and react-native-safe-area-context once, app-wide, no per-instance repetition', 'TypeScript types for scan results, bounds, and photo results']
+const FEATURES = ['Full-screen camera view with animated scan overlay', 'Bounds component draws a highlighted rectangle around detected barcodes', 'TimerRing shows a countdown ring when a scan timeout is configured', 'Pinch-to-zoom', 'Scan deduplication, so onScan fires once per unique code per session', 'useScanOverlays hook for building custom animated feedback', 'Photo capture with configurable quality and base64 output', 'Multi-barcode support, detects all codes in frame simultaneously', 'configureScanner()/ScannerProvider set expo-camera, react-native-paper, and react-native-safe-area-context once, app-wide, no per-instance repetition', 'TypeScript types for scan results and photo results']
 
 const PROPS = [
   { name: 'onScan', type: '(result: ScanResult) => void', desc: 'Fired when a barcode is successfully scanned.' },
-  { name: 'onPhoto', type: '(result: PhotoResult) => void', desc: 'Fired after a photo capture completes.' },
+  { name: 'onPhoto', type: '(result: PhotoResult) => void', desc: 'Fired after a photo capture completes (requires mode="photo").' },
   { name: 'timeout', type: 'number', desc: 'Seconds before the TimerRing expires and onTimeout fires.' },
-  { name: 'zoom', type: 'number', desc: 'Controlled zoom level (0–1).' },
   { name: 'camera / paper / safeArea', type: 'module', desc: 'Per-instance overrides for the configureScanner() defaults below; omit these unless one particular screen needs something different.' },
   {
     name: 'ScanResult',
     type: 'type',
     desc: '{ data: string, type: string }: the decoded barcode value and symbology.'
-  },
-  {
-    name: 'BarcodeScanResult',
-    type: 'type',
-    desc: 'Extended result with bounds origin/size and corner points.'
   },
   { name: 'PhotoResult', type: 'type', desc: '{ uri, width, height, base64? } from a capture.' }
 ]
@@ -45,6 +38,7 @@ configureScanner({ camera: ExpoCamera, paper: RNPaper, safeArea: SafeAreaContext
 
 // With photo capture
 <Scanner
+  mode="photo"
   onScan={handleScan}
   onPhoto={(photo) => {
     console.log(photo.uri)
@@ -56,7 +50,6 @@ const ScannerPage = () => {
 
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
-      <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
         <ScrollViewHeader backAction={safeBack} title='@rific/scanner' />
         <ScrollView contentContainerStyle={styles.container}>
@@ -66,7 +59,7 @@ const ScannerPage = () => {
           </Text>
 
           <Surface style={[styles.installBox, { backgroundColor: theme.colors.surfaceVariant }]} elevation={0}>
-            <Text style={[styles.code, { color: theme.colors.onSurfaceVariant }]}>{'npm install @rific/scanner expo-camera \\\n  react-native-gesture-handler react-native-worklets react-native-svg'}</Text>
+            <Text style={[styles.code, { color: theme.colors.onSurfaceVariant }]}>npx expo install @rific/scanner expo-camera react-native-svg</Text>
           </Surface>
 
           <Divider style={styles.divider} />

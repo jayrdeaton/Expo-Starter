@@ -1,5 +1,4 @@
-import * as AutoPaper from '@rific/auto-paper'
-import { combineDrawerProviders, createDrawer, DrawerProvider } from '@rific/drawer'
+import { combineDrawerProviders, createDrawer } from '@rific/drawer'
 import { Button, IconButton, Switch } from '@rific/feedback-press'
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
 import { Stack } from 'expo-router'
@@ -13,7 +12,7 @@ import { safeBack } from '@/utils/navigation'
 
 const nav = createDrawer({ side: 'left', width: 280 })
 // blur: true here demonstrates @rific/auto-paper's BlurView on the panel surface, see the
-// <DrawerProvider autoPaper={AutoPaper}> wrapping DrawerDemoPage below, which is what actually
+// <DrawerProvider autoPaper={AutoPaper}> in src/components/Providers.tsx, which is what actually
 // makes that render as a real blur instead of the solid-fill fallback.
 const settings = createDrawer({ side: 'right', width: 300, blur: true })
 const sheet = createDrawer({ side: 'bottom', height: 220, contentSize: true })
@@ -44,19 +43,18 @@ const NavDrawerContent = () => {
 
 const SettingsDrawerContent = () => {
   const { close } = settings.useDrawer()
-  const theme = useTheme()
   const insets = useSafeAreaInsets()
   const [darkMode, setDarkMode] = useState(false)
   const [notifications, setNotifications] = useState(true)
 
   return (
-    <View style={[styles.drawerContent, { backgroundColor: theme.colors.surface, paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+    <View style={[styles.drawerContent, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <View style={styles.drawerHeader}>
         <Text variant='titleMedium'>Settings</Text>
         <IconButton icon='close' onPress={close} accessibilityLabel='Close' />
       </View>
-      <List.Item title='Dark mode' right={() => <Switch value={darkMode} onValueChange={setDarkMode} />} />
-      <List.Item title='Notifications' right={() => <Switch value={notifications} onValueChange={setNotifications} />} />
+      <List.Item title='Dark mode' right={() => <Switch value={darkMode} onValueChange={setDarkMode} accessibilityLabel='Dark mode' />} />
+      <List.Item title='Notifications' right={() => <Switch value={notifications} onValueChange={setNotifications} accessibilityLabel='Notifications' />} />
     </View>
   )
 }
@@ -108,18 +106,18 @@ const ExpandableSheetContent = () => {
   )
 }
 
-const AllDrawersProvider = combineDrawerProviders([nav.DrawerInstanceProvider, { content: <NavDrawerContent /> }], [settings.DrawerInstanceProvider, { content: <SettingsDrawerContent /> }], [sheet.DrawerInstanceProvider, { content: <SheetContent /> }], [expandableSheet.DrawerInstanceProvider, { content: <ExpandableSheetContent /> }])
+const AllDrawersProvider = combineDrawerProviders([nav.DrawerInstanceProvider, { content: <NavDrawerContent /> }], [settings.DrawerInstanceProvider, { content: <SettingsDrawerContent /> }], [sheet.DrawerInstanceProvider, { content: <SheetContent /> }], [expandableSheet.DrawerInstanceProvider, { content: <ExpandableSheetContent />, enabled: false }])
 
 const FEATURES = [
   'Spring-animated sliding panel with a tap-to-dismiss backdrop',
   'Opens by calling open(), or by swiping in from the screen edge',
-  'Slides in from any of the four edges: left/right for a drawer, top/bottom for a bottom sheet, same mechanism either way, so one package covers both (no separate bottom-sheet dependency needed)',
+  'Slides in from any of the four edges: left/right for a drawer, top/bottom for a sheet, same mechanism either way, so one package covers both (no separate bottom-sheet dependency needed)',
   'One createDrawer() call per instance: a left nav drawer, a right settings drawer, and a bottom sheet all stay fully independent',
   'combineDrawerProviders() flattens nesting multiple drawers into a single wrapper',
   'contentSize sizes the panel to its content along the main axis instead of a fixed width/height, and animates smoothly if that size changes',
   'width/height accept a percentage string, resolved against the window size, instead of a plain pixel number',
   'maxHeight/maxWidth turn the panel into an expandable sheet: opens to width/height as usual, but the same drag handle can pull it open further, up to this ceiling, instead of just toggling open/closed',
-  'useDrawer() exposes expandProgress, a live 0-1 SharedValue tracking how expanded the sheet currently is, for content that should only react once the panel is genuinely at its full extent (see the expandable sheet below)',
+  'useDrawer() exposes expandProgress, a live 0-1 SharedValue tracking how expanded the sheet currently is, for content that should only react once the panel is genuinely at its full extent (open the expandable sheet above)',
   'Built-in swipe-to-dismiss drag handle on the panel edge closest to closed, floating just outside the panel rather than claiming space inside it',
   'Theme-aware: reads its surface color from react-native-paper, with an optional blurred surface via @rific/auto-paper, configured once via configureDrawer()/<DrawerProvider>, not auto-detected (see the settings drawer below)',
   'enabled prop to temporarily suppress the edge-swipe gesture',
@@ -133,7 +131,8 @@ const PROPS = [
   { name: 'expandProgress', type: 'SharedValue<number>', desc: "useDrawer()'s own field, not a createDrawer() option: 0 at rest, 1 fully expanded, live as the handle drags or springs. Always 1 without maxHeight/maxWidth." },
   { name: 'contentSize', type: 'boolean', desc: 'Sizes the panel to its content instead of a fixed width/height. Default: false.' },
   { name: 'content', type: 'ReactNode', desc: "The DrawerInstanceProvider's own prop: what renders inside the sliding panel." },
-  { name: 'dismissible / showHandle', type: 'boolean', desc: 'Whether the drag handle renders and can be swiped to dismiss. Both default: true.' },
+  { name: 'dismissible', type: 'boolean', desc: 'Whether the drag handle strip, and its swipe-to-dismiss gesture, exist at all. Default: true.' },
+  { name: 'showHandle', type: 'boolean', desc: "Whether the handle strip's pill graphic draws. The strip stays grabbable either way. Default: true." },
   { name: 'blockingBackdrop / backdropOpacity', type: 'boolean / number', desc: 'Whether the backdrop intercepts touches, and how dark it gets at full open. Defaults: true / 0.45.' },
   { name: 'blur', type: 'boolean', desc: "Blurred panel surface via @rific/auto-paper's BlurView, instead of a solid one." },
   { name: 'zIndex', type: 'number', desc: 'Stacking tier when more than one drawer can be open at once. Default: 50.' },
@@ -153,7 +152,8 @@ const AllDrawersProvider = combineDrawerProviders(
   [nav.DrawerInstanceProvider, { content: <AppDrawerContent /> }],
   [settings.DrawerInstanceProvider, { content: <SettingsDrawerContent /> }],
   [sheet.DrawerInstanceProvider, { content: <SheetContent /> }],
-  [expandableSheet.DrawerInstanceProvider, { content: <ExpandableSheetContent /> }]
+  // shares the bottom edge with sheet, so only one of them can own the edge swipe
+  [expandableSheet.DrawerInstanceProvider, { content: <ExpandableSheetContent />, enabled: false }]
 )
 
 // once, near the app root (inside GestureHandlerRootView), configures @rific/auto-paper's
@@ -179,13 +179,12 @@ const DrawerDemoContent = () => {
 
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
-      <Stack.Screen options={{ headerShown: false, gestureEnabled: false }} />
+      <Stack.Screen options={{ gestureEnabled: false }} />
       <ScrollViewProvider>
-        <ScrollViewHeader backAction={safeBack} title='@rific/drawer' />
+        <ScrollViewHeader backAction={safeBack} title='Drawer' caption='@rific/drawer' />
         <ScrollView contentContainerStyle={styles.container}>
-          <Text variant='headlineSmall'>Drawer</Text>
           <Text variant='bodyMedium' style={[styles.desc, { color: theme.colors.onSurfaceVariant }]}>
-            Sliding drawer/sheet with edge-swipe gestures. left/right for a drawer, top/bottom for a bottom sheet, same package handles both.
+            Sliding drawer/sheet with edge-swipe gestures. left/right for a drawer, top/bottom for a sheet, same package handles both.
           </Text>
 
           <Divider style={styles.divider} />
@@ -193,7 +192,7 @@ const DrawerDemoContent = () => {
             Try it
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-            Tap a button below, or swipe in from the left/right screen edge or up from the bottom.
+            Tap a button below, or swipe in from the left/right screen edge, or up from the bottom for the bottom sheet. The expandable sheet shares that edge, so its own edge swipe is off (enabled: false).
           </Text>
           <View style={styles.row}>
             <Button mode='contained' icon='menu' onPress={navDrawer.open}>
@@ -254,15 +253,10 @@ const DrawerDemoContent = () => {
   )
 }
 
-// autoPaper configured here (rather than globally in Providers.tsx) since Drawer is only used
-// on this one screen: configureDrawer()/<DrawerProvider> is one-time app-wide setup, but
-// "app-wide" just means "wherever your Drawers actually live," not necessarily the root.
 const DrawerDemoPage = () => (
-  <DrawerProvider autoPaper={AutoPaper}>
-    <AllDrawersProvider>
-      <DrawerDemoContent />
-    </AllDrawersProvider>
-  </DrawerProvider>
+  <AllDrawersProvider>
+    <DrawerDemoContent />
+  </AllDrawersProvider>
 )
 
 const styles = StyleSheet.create({
@@ -281,9 +275,9 @@ const styles = StyleSheet.create({
   },
   codeBlock: { borderRadius: 12, padding: 16 },
   container: { paddingHorizontal: 16, paddingTop: 16 },
-  desc: { marginTop: 8 },
+  desc: { marginTop: 0 },
   divider: { marginVertical: 20 },
-  drawerContent: { flex: 1, paddingTop: 8 },
+  drawerContent: { flex: 1 },
   drawerHeader: {
     alignItems: 'center',
     flexDirection: 'row',

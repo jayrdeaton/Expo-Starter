@@ -1,5 +1,4 @@
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
-import { Stack } from 'expo-router'
 import { Platform, StyleSheet, View } from 'react-native'
 import { Divider, Surface, Text, useTheme } from 'react-native-paper'
 
@@ -23,6 +22,7 @@ const PROPS = [
 const USAGE = `import { Timer } from '@rific/timer'
 import { useState } from 'react'
 import { Text } from 'react-native'
+import { Button } from 'react-native-paper'
 
 const CountdownTimer = () => {
   const [started, setStarted] = useState<string | null>(null)
@@ -55,7 +55,6 @@ const TimerPage = () => {
 
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
-      <Stack.Screen options={{ headerShown: false }} />
       <ScrollViewProvider>
         <ScrollViewHeader backAction={safeBack} title='@rific/timer' />
         <ScrollView contentContainerStyle={styles.container}>
@@ -65,7 +64,7 @@ const TimerPage = () => {
           </Text>
 
           <Surface style={[styles.installBox, { backgroundColor: theme.colors.surfaceVariant }]} elevation={0}>
-            <Text style={[styles.code, { color: theme.colors.onSurfaceVariant }]}>npm install @rific/timer react-native-svg</Text>
+            <Text style={[styles.code, { color: theme.colors.onSurfaceVariant }]}>npx expo install @rific/timer react-native-svg</Text>
           </Surface>
 
           <Divider style={styles.divider} />
