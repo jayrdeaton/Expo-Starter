@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Expo Starter",
-    "slug": "expo-starter",
+    "slug": "ExpoStarter",
     "version": "0.0.0",
     "scheme": "app",
     "description": "An Expo starter project",
@@ -14,7 +14,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0,
       "checkAutomatically": "ON_LOAD",
-      "url": "https://u.expo.dev/de02c8cc-bf5b-4922-97bd-88bdde107c75"
+      "url": "https://u.expo.dev/27fe309d-95bb-481c-b7f7-e1ec5549d057"
     },
     "runtimeVersion": {
       "policy": "fingerprint"
@@ -65,8 +65,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "de02c8cc-bf5b-4922-97bd-88bdde107c75"
+        "projectId": "27fe309d-95bb-481c-b7f7-e1ec5549d057"
       }
-    }
+    },
+    "owner": "jayrdeaton"
   }
 }
