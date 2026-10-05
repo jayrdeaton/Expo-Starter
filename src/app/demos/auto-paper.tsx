@@ -75,14 +75,14 @@ const AutoPaperDemo = () => {
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
             AutoAppearancePicker and AutoPalettePicker are the same pickers as above, pre-wired straight to this app&apos;s live theme — no value/onChange (or harmony/onHarmonyChange) to pass, they read/write useThemeSettings() internally. Reach for the plain versions instead when a picker needs to be controlled by something other than the global theme, e.g. a local preview before committing.
           </Text>
-          <View style={styles.autoPickersRow}>
-            <View style={styles.autoPickerCol}>
+          <View style={styles.autoPickers}>
+            <View style={styles.autoPicker}>
               <Text variant='labelLarge' style={[styles.autoPickerLabel, { color: theme.colors.onSurfaceVariant }]}>
                 Appearance
               </Text>
               <AutoAppearancePicker />
             </View>
-            <View style={styles.autoPickerCol}>
+            <View style={styles.autoPicker}>
               <Text variant='labelLarge' style={[styles.autoPickerLabel, { color: theme.colors.onSurfaceVariant }]}>
                 Palette + Harmony
               </Text>
@@ -305,9 +305,9 @@ const AutoPaperDemo = () => {
 }
 
 const styles = StyleSheet.create({
-  autoPickerCol: { alignItems: 'flex-start', gap: 8 },
+  autoPicker: { gap: 8 },
   autoPickerLabel: { marginBottom: 0 },
-  autoPickersRow: { columnGap: 32, flexDirection: 'row', flexWrap: 'wrap', rowGap: 16 },
+  autoPickers: { gap: 16 },
   blurButtons: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   blurRow: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 },
   colorDot: { borderRadius: 12, height: 24, width: 24 },
