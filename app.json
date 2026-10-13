@@ -20,7 +20,7 @@
       "policy": "fingerprint"
     },
     "userInterfaceStyle": "automatic",
-    "icon": "./assets/images/dark-icon.png",
+    "icon": "./assets/images/icon-dark.png",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.infinitetoken.ExpoStarter",
@@ -29,12 +29,15 @@
         "UIViewControllerBasedStatusBarAppearance": false
       },
       "icon": {
-        "dark": "./assets/images/dark-icon.png",
-        "light": "./assets/images/light-icon.png"
+        "dark": "./assets/images/icon-dark.png",
+        "light": "./assets/images/icon-light.png"
       }
     },
     "android": {
       "package": "com.infinitetoken.expostarter"
+    },
+    "web": {
+      "favicon": "./assets/images/icon-dark.png"
     },
     "plugins": [
       "expo-router",
@@ -43,12 +46,12 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/light-splash.png",
+          "image": "./assets/images/splash-light.png",
           "imageWidth": 200,
-          "backgroundColor": "#F0F0F0",
+          "backgroundColor": "#FAFAFA",
           "dark": {
-            "image": "./assets/images/dark-splash.png",
-            "backgroundColor": "#0F0F0F"
+            "image": "./assets/images/splash-dark.png",
+            "backgroundColor": "#050505"
           }
         }
       ],

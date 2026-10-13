@@ -80,3 +80,7 @@ src/
 ## CI
 
 `.github/workflows/ci.yml` already used the shared reusable workflow (`infinitetoken/Workflows/.github/workflows/npm-ci.yml@v1`) before this pass, just with a non-standard `run-name` (showed the PR title/commit message instead of the branch) — converged to the fleet-standard `run-name: CI — ${{ github.head_ref || github.ref_name }}` format for consistency, no functional change.
+
+## Icons and splash (2026-10-13)
+
+The asset names and `app.json` config match the games (AirHockey, BoxHockey, Hangman, LightCycles, Pong, Snake, Solitaire): `assets/images/icon-light.png`, `icon-dark.png`, `splash-light.png` and `splash-dark.png`. `expo.icon` and `web.favicon` are `icon-dark.png`, `ios.icon` is the dark/light pair, there is no Android `adaptiveIcon`, and the splash is `imageWidth` 200 with the light/dark images. The icons are opaque 1024px squares on `#FAFAFA` (light) and `#050505` (dark), the same as the games. Each splash is its icon's art on a transparent background, and the plugin's `backgroundColor`s are those same two colors. A new app's own icons should keep those backgrounds, so the splash colors never need to change.
