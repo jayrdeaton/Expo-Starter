@@ -86,7 +86,7 @@ const AllDrawersProvider = combineDrawerProviders(
 const { open } = sheet.useDrawer();
 ```
 
-Each panel comes with a swipe-to-dismiss drag handle and an edge-swipe-to-open gesture built in. `blur: true` renders the panel surface via `@rific/auto-paper`'s `BlurView` instead of a solid fill — but only once `<DrawerProvider autoPaper={AutoPaper}>` is mounted above it; without it, `blur: true` silently falls back to solid. This app mounts it once in [`Providers.tsx`](src/components/Providers.tsx), above every Drawer (the toaster's history sheet opts out with `blur={false}`, since its content paints its own opaque surface).
+Each panel comes with a swipe-to-dismiss drag handle and an edge-swipe-to-open gesture built in. `blur: true` renders the panel surface via `@rific/auto-paper`'s `BlurView` instead of a solid fill, but only once `<DrawerProvider autoPaper={AutoPaper}>` is mounted above it; without it, `blur: true` silently falls back to solid. This app mounts it once in [`Providers.tsx`](src/components/Providers.tsx), above every Drawer (the toaster's history sheet opts out with `blur={false}`, since its content paints its own opaque surface).
 
 ---
 
@@ -150,7 +150,7 @@ success('Saved!');
 
 ### `@rific/updater`
 
-OTA update hook for Expo apps. Checks for updates on launch and on every foreground resume, prompting to restart as soon as one's found — pass `autoPrompt: false` to stage them silently instead. Also exposes a manual `check()`, plus `onConfirm`/`onInfo`/`onError` callbacks to replace the default `Alert.alert` dialogs. This app calls it from a small `UpdateChecker` inside `ToastProvider` in [`Providers.tsx`](src/components/Providers.tsx), so `onError` (in practice a failed confirm/reload during the auto-prompt, since `UpdateChecker` never calls `check()`) shows an error toast instead of an `Alert`. Failed background checks stay silent.
+OTA update hook for Expo apps. Checks for updates on launch and on every foreground resume, prompting to restart as soon as one's found: pass `autoPrompt: false` to stage them silently instead. Also exposes a manual `check()`, plus `onConfirm`/`onInfo`/`onError` callbacks to replace the default `Alert.alert` dialogs. This app calls it from a small `UpdateChecker` inside `ToastProvider` in [`Providers.tsx`](src/components/Providers.tsx), so `onError` (in practice a failed confirm/reload during the auto-prompt, since `UpdateChecker` never calls `check()`) shows an error toast instead of an `Alert`. Failed background checks stay silent.
 
 ```tsx
 import { useUpdateErrorToast } from '@rific/toaster';
@@ -223,7 +223,7 @@ useSplashReady('fonts', fontsLoaded || fontError != null); // a failed load stil
 const onReady = useCallback(() => markSplashReady('theme'), []); // a one-shot callback, not a boolean, call directly
 ```
 
-`Gate` (exported here as `SplashGate`, not used yet) is `useReady` plus render-gating in one step: it withholds `children` until `ready` is `true`, instead of just marking the gate. Reach for it over `useReady` when what you're mounting is a component whose own state locks in on first render (a lazy `useState(() => initialProp)` initializer, the same pattern most context providers use) — marking the gate ready doesn't help if the child already locked onto a stale placeholder before that:
+`Gate` (exported here as `SplashGate`, not used yet) is `useReady` plus render-gating in one step: it withholds `children` until `ready` is `true`, instead of just marking the gate. Reach for it over `useReady` when what you're mounting is a component whose own state locks in on first render (a lazy `useState(() => initialProp)` initializer, the same pattern most context providers use): marking the gate ready doesn't help if the child already locked onto a stale placeholder before that:
 
 ```tsx
 // keyboardLayout: null while loading from storage, the real value once it resolves
@@ -319,3 +319,7 @@ src/
 - **Bundle identifiers**: `ios.bundleIdentifier` and `android.package` in [app.json](app.json)
 - **EAS project**: `extra.eas.projectId` and `updates.url` (`https://u.expo.dev/<projectId>`) in [app.json](app.json) both point at this starter's EAS project. Delete both, then run `eas init` (creates or links your own project and writes `extra.eas.projectId`) and `eas update:configure` (writes the matching `updates.url`)
 - **Theme seed color**: defaults to `#6750a4`; override by swapping `themeReducer` for `createThemeReducer({ color: '...' })` from `@rific/auto-paper` in [redux/store.ts](src/redux/store.ts)
+
+## License
+
+MIT, see [LICENSE](LICENSE). It's a template, so start your own projects from it freely.
