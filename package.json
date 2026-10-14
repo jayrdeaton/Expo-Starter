@@ -33,7 +33,7 @@
     "@rific/auto-paper": "^0.12.2",
     "@rific/core": "^0.3.0",
     "@rific/drawer": "^0.6.1",
-    "@rific/feedback-press": "^0.12.1",
+    "@rific/feedback-press": "^0.12.2",
     "@rific/focus-chain": "^0.4.7",
     "@rific/resizable-input": "^0.4.2",
     "@rific/scroll-view": "^0.9.0",
