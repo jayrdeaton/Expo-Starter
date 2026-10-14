@@ -19,6 +19,9 @@
       "environment": "preview",
       "android": {
         "buildType": "apk"
+      },
+      "ios": {
+        "image": "macos-tahoe-26.5-xcode-26.6"
       }
     },
     "production": {
@@ -26,7 +29,8 @@
       "channel": "production",
       "environment": "production",
       "ios": {
-        "resourceClass": "m-medium"
+        "resourceClass": "m-medium",
+        "image": "macos-tahoe-26.5-xcode-26.6"
       }
     }
   },

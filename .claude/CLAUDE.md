@@ -84,3 +84,7 @@ src/
 ## Icons and splash (2026-10-13)
 
 The asset names and `app.json` config match the games (AirHockey, BoxHockey, Hangman, LightCycles, Pong, Snake, Solitaire): `assets/images/icon-light.png`, `icon-dark.png`, `splash-light.png` and `splash-dark.png`. `expo.icon` and `web.favicon` are `icon-dark.png`, `ios.icon` is the dark/light pair, there is no Android `adaptiveIcon`, and the splash is `imageWidth` 200 with the light/dark images. The icons are opaque 1024px squares on `#FAFAFA` (light) and `#050505` (dark), the same as the games. Each splash is its icon's art on a transparent background, and the plugin's `backgroundColor`s are those same two colors. A new app's own icons should keep those backgrounds, so the splash colors never need to change.
+
+## Xcode 26 image pin (remove on Expo SDK 58)
+
+`eas.json` pins the `preview` and `production` iOS builds to `macos-tahoe-26.5-xcode-26.6` (set fleet-wide 2026-10-14). An app linked against the iOS 27 SDK aborts at launch on iOS 27 ("UIScene life cycle is required for apps built with this SDK") unless it adopts the UIScene life cycle, which SDK 57's native template doesn't do and SDK 58's does. A build made with Xcode 26 runs fine on iOS 27. **When this app moves to Expo SDK 58, remove both `ios.image` pins and this section**, so builds go back to EAS's default image for the SDK. Local builds (`expo run:ios`, the `development` profile) ignore the pin and use this Mac's Xcode 27, so until then they crash at launch on an iOS 27 device or simulator.
