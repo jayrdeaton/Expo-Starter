@@ -37,7 +37,7 @@ const DEMO_SLICE_REHYDRATED = demoReducer(undefined, STALE_REHYDRATE)
 
 // --- createModuleConfig + OptionalModule --------------------------------------------------------
 // Mirrors only the slice of the injected module this demo actually calls, never
-// `typeof import('the-real-package')` — the same rule @rific/scanner follows for
+// `typeof import('the-real-package')` - the same rule @rific/scanner follows for
 // expo-camera/react-native-paper and @rific/drawer for @rific/auto-paper.
 type GreeterModule = { greet: (name: string) => string }
 type DemoModuleConfig = { greeter?: OptionalModule<GreeterModule> }
@@ -161,7 +161,7 @@ const SettingsSliceDemo = () => {
           initialize(defaults)
         </Button>
       </View>
-      <Readout>{`state = ${JSON.stringify(state)}\nselectLabel(state) = ${JSON.stringify(demoSelectors.selectLabel(state))}\nlast action.type = ${lastType ?? '—'}`}</Readout>
+      <Readout>{`state = ${JSON.stringify(state)}\nselectLabel(state) = ${JSON.stringify(demoSelectors.selectLabel(state))}\nlast action.type = ${lastType ?? '-'}`}</Readout>
 
       <Text variant='labelMedium' style={styles.logLabel}>
         Rehydrating an older persisted blob

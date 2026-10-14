@@ -9,7 +9,7 @@ import { createGate } from '@rific/splash-gate'
 // pendingSplashGates for the day a future provider needs it: something that mounts a
 // third-party component whose internal state locks in on first render (a lazy useState(() =>
 // initialProp) initializer) must not render until its real value exists, or the gate reporting
-// ready doesn't help — see the demo at src/app/demos/splash-gate.tsx for why. None of this app's
+// ready doesn't help - see the demo at src/app/demos/splash-gate.tsx for why. None of this app's
 // current providers have that shape (PersistGate already blocks every child below it until
 // Redux's persisted state has rehydrated, so `settings` is already correct the first time
 // Theme.tsx renders), so nothing here uses it yet.

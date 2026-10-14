@@ -20,7 +20,7 @@ const INFO_ITEMS = [
   },
   {
     label: 'onConfirm callback',
-    desc: 'Custom confirmation dialog in place of the default Alert. Called with the update manifest — return true to reload, false to cancel.'
+    desc: 'Custom confirmation dialog in place of the default Alert. Called with the update manifest: return true to reload, false to cancel.'
   },
   {
     label: 'onError callback',
@@ -28,11 +28,11 @@ const INFO_ITEMS = [
   },
   {
     label: 'onInfo callback',
-    desc: "Custom handler for check()'s three purely-informational cases — dev-mode disabled, web unsupported, already up to date. Called with (title, message); no confirm/cancel choice involved. Defaults to Alert.alert like onError. Demoed below."
+    desc: "Custom handler for check()'s three purely-informational cases: dev-mode disabled, web unsupported, already up to date. Called with (title, message); no confirm/cancel choice involved. Defaults to Alert.alert like onError. Demoed below."
   },
   {
     label: 'updateReady',
-    desc: 'True once a fetch has staged an update. Transient with the default autoPrompt: true; persists until check() runs when autoPrompt is false — useful for a settings badge. Only autoCheck fetches set it, so it stays false on this screen (autoCheck: false).'
+    desc: 'True once a fetch has staged an update. Transient with the default autoPrompt: true; persists until check() runs when autoPrompt is false, which is useful for a settings badge. Only autoCheck fetches set it, so it stays false on this screen (autoCheck: false).'
   },
   {
     label: 'check()',
@@ -56,7 +56,7 @@ const UpdaterDemo = () => {
         <ScrollViewHeader backAction={safeBack} title='Updater' caption='@rific/updater' />
         <ScrollView contentContainerStyle={styles.container}>
           <Text variant='bodyMedium' style={[styles.desc, { color: theme.colors.onSurfaceVariant }]}>
-            OTA update hook for Expo apps. Checks for updates on launch and on every foreground resume, and prompts to restart as soon as one&apos;s found. Exposes a manual check function, an optional confirmation callback before applying the update, and an onInfo callback for check()&apos;s informational messages — pass autoPrompt: false to stage updates silently instead.
+            OTA update hook for Expo apps. Checks for updates on launch and on every foreground resume, and prompts to restart as soon as one&apos;s found. Exposes a manual check function, an optional confirmation callback before applying the update, and an onInfo callback for check()&apos;s informational messages: pass autoPrompt: false to stage updates silently instead.
           </Text>
 
           <Divider style={styles.divider} />

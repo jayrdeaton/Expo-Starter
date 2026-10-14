@@ -49,7 +49,7 @@ const AutoPaperDemo = () => {
             Palette Picker
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-            Same seed swatches, but each one previews its full triadic palette as a pie instead of a flat color. Pass onHarmonyChange to fold a compact harmony row into the same dialog — open it and try changing harmony right there, every pie reshapes live.
+            Same seed swatches, but each one previews its full triadic palette as a pie instead of a flat color. Pass onHarmonyChange to fold a compact harmony row into the same dialog: open it and try changing harmony right there, every pie reshapes live.
           </Text>
           <PalettePicker value={seedColor} onChange={(c) => set({ color: c })} harmony={harmony} onHarmonyChange={(h) => set({ harmony: h })} />
 
@@ -73,7 +73,7 @@ const AutoPaperDemo = () => {
             Auto Pickers
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-            AutoAppearancePicker and AutoPalettePicker are the same pickers as above, pre-wired straight to this app&apos;s live theme — no value/onChange (or harmony/onHarmonyChange) to pass, they read/write useThemeSettings() internally. Reach for the plain versions instead when a picker needs to be controlled by something other than the global theme, e.g. a local preview before committing.
+            AutoAppearancePicker and AutoPalettePicker are the same pickers as above, pre-wired straight to this app&apos;s live theme, no value/onChange (or harmony/onHarmonyChange) to pass, they read/write useThemeSettings() internally. Reach for the plain versions instead when a picker needs to be controlled by something other than the global theme, e.g. a local preview before committing.
           </Text>
           <View style={styles.autoPickers}>
             <View style={styles.autoPicker}>

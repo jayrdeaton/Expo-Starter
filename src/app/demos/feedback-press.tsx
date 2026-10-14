@@ -97,7 +97,7 @@ const FeedbackPressDemo = () => {
             App Settings
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-            App-wide switches, not just this screen&apos;s demo toggles below — haptics persists via the same redux-backed FeedbackPressProvider wiring every wrapped component already reads from, and sound persists alongside it. Both survive an app restart.
+            App-wide switches, not just this screen&apos;s demo toggles below: haptics persists via the same redux-backed FeedbackPressProvider wiring every wrapped component already reads from, and sound persists alongside it. Both survive an app restart.
           </Text>
           <View style={styles.settingRow}>
             <Text variant='bodyMedium'>Haptics</Text>
@@ -113,7 +113,7 @@ const FeedbackPressDemo = () => {
             Haptic Types
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-            Tap to feel each vibration pattern. These use useVibration&apos;s force* variants, so they fire even with the Haptics switch above off — the Notification Types below respect it.
+            Tap to feel each vibration pattern. These use useVibration&apos;s force* variants, so they fire even with the Haptics switch above off: the Notification Types below respect it.
           </Text>
           <View style={styles.row}>
             {[
@@ -149,7 +149,7 @@ const FeedbackPressDemo = () => {
             Sound
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-            The provider plays a synthesized click on press and a synthesized pop on long-press by default. Press and hold each button below to hear both — including the original recorded set, kept around as a Classic override.
+            The provider plays a synthesized click on press and a synthesized pop on long-press by default. Press and hold each button below to hear both, including the original recorded set, kept around as a Classic override.
           </Text>
           <Button mode='contained' style={styles.item} onPress={() => {}} onLongPress={() => {}}>
             Provider default (press: click · hold: pop)
@@ -170,7 +170,7 @@ const FeedbackPressDemo = () => {
           </View>
 
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-            Notice the button above always clicks on touch-down, then also pops if you hold past delayLongPress — that&apos;s intentional default wiring, not a bug. Pass exclusive for exactly one or the other: click is deferred to release and only fires if the press never escalated to a long-press. Same onPress/onLongPress on both buttons below — Default&apos;s click always lands at ~0ms into the hold; Exclusive&apos;s lands at release, so however long you hold (short of delayLongPress) before letting go is the delay it adds. Hold each briefly and release to measure it, then hold past 400ms to feel Exclusive suppress the click entirely.
+            Notice the button above always clicks on touch-down, then also pops if you hold past delayLongPress that&apos;s intentional default wiring, not a bug. Pass exclusive for exactly one or the other: click is deferred to release and only fires if the press never escalated to a long-press. Same onPress/onLongPress on both buttons below Default&apos;s click always lands at ~0ms into the hold; Exclusive&apos;s lands at release, so however long you hold (short of delayLongPress) before letting go is the delay it adds. Hold each briefly and release to measure it, then hold past 400ms to feel Exclusive suppress the click entirely.
           </Text>
           <View style={[styles.row, styles.item]}>
             <View style={styles.compareItem}>
@@ -178,7 +178,7 @@ const FeedbackPressDemo = () => {
                 Default
               </Button>
               <Text variant='bodySmall' style={{ color: theme.colors.onSurfaceVariant }}>
-                held {defaultHeldMs ?? '—'}ms · click at ~0ms
+                held {defaultHeldMs ?? '-'}ms · click at ~0ms
               </Text>
             </View>
             <View style={styles.compareItem}>
@@ -186,16 +186,16 @@ const FeedbackPressDemo = () => {
                 Exclusive
               </Button>
               <Text variant='bodySmall' style={{ color: theme.colors.onSurfaceVariant }}>
-                held {exclusiveHeldMs ?? '—'}ms · {exclusiveEscalated ? 'no click, pop instead' : `click at ~${exclusiveHeldMs ?? '—'}ms`}
+                held {exclusiveHeldMs ?? '-'}ms · {exclusiveEscalated ? 'no click, pop instead' : `click at ~${exclusiveHeldMs ?? '-'}ms`}
               </Text>
             </View>
           </View>
 
           <Text variant='bodySmall' style={[styles.hint, styles.item, { color: theme.colors.onSurfaceVariant }]}>
-            Every sound on its own, no press gesture required — tap a chip to audition it.
+            Every sound on its own, no press gesture required: tap a chip to audition it.
           </Text>
           <Text variant='bodySmall' style={[styles.hint, styles.item, { color: theme.colors.onSurfaceVariant }]}>
-            Every sound below plays through @rific/feedback-press/audio&apos;s useAudioPool rather than a single shared player, which is why rapid repeat taps on the same chip never drop a sound — each tap round-robins to a different pooled player instead of racing the previous tap&apos;s still-in-flight playback.
+            Every sound below plays through @rific/feedback-press/audio&apos;s useAudioPool rather than a single shared player, which is why rapid repeat taps on the same chip never drop a sound: each tap round-robins to a different pooled player instead of racing the previous tap&apos;s still-in-flight playback.
           </Text>
           {soundSets.map((set) => (
             <View key={set.label} style={styles.item}>
@@ -273,7 +273,7 @@ const FeedbackPressDemo = () => {
             Hold to Repeat
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-            useHoldToRepeat fires an action immediately once you&apos;ve held past delayLongPress, then again every 400ms for as long as you keep holding — with a haptic + sound pulse on every tick, not just the first. Release to stop instantly. Press and hold, don&apos;t tap.
+            useHoldToRepeat fires an action immediately once you&apos;ve held past delayLongPress, then again every 400ms for as long as you keep holding, with a haptic + sound pulse on every tick, not just the first. Release to stop instantly. Press and hold, don&apos;t tap.
           </Text>
           <View style={styles.holdRow}>
             <FAB icon='minus' accessibilityLabel='Hold to decrement' size='small' onLongPress={decrementHold.onLongPress} onPressOut={decrementHold.onPressOut} delayLongPress={400} />
@@ -287,7 +287,7 @@ const FeedbackPressDemo = () => {
             Hold to Repeat (keyed)
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-            useHoldToRepeatByKey keeps a separate timer per key — hold two of these at once (two fingers) and each repeats on its own cadence; releasing one never stops the other.
+            useHoldToRepeatByKey keeps a separate timer per key: hold two of these at once (two fingers) and each repeats on its own cadence; releasing one never stops the other.
           </Text>
           <View style={styles.row}>
             {HOLD_KEYS.map((key) => (

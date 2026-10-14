@@ -65,10 +65,10 @@ const CustomListDemo = () => {
         <PullSearch onChangeText={handleChangeText} onHeightChange={setPullSearchHeight} placeholder='Search…' ref={searchRef} />
         <View style={styles.filters}>
           <Chip compact selected={sort === 'asc'} onPress={() => setSort('asc')} icon='sort-alphabetical-ascending'>
-            A–Z
+            A-Z
           </Chip>
           <Chip compact selected={sort === 'desc'} onPress={() => setSort('desc')} icon='sort-alphabetical-descending'>
-            Z–A
+            Z-A
           </Chip>
         </View>
       </View>

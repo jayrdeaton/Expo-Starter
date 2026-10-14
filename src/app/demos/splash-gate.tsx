@@ -33,7 +33,7 @@ const INFO_ITEMS = [
   },
   {
     label: 'Gate',
-    desc: "A component form of useReady that also withholds its children until ready. For a child whose own state locks in on first render (see the comparison above), a gate reporting ready isn't enough on its own — the child must not mount at all until the real value exists."
+    desc: "A component form of useReady that also withholds its children until ready. For a child whose own state locks in on first render (see the comparison above), a gate reporting ready isn't enough on its own: the child must not mount at all until the real value exists."
   },
   {
     label: 'One hide, once',
@@ -48,7 +48,7 @@ const RESOLVED_COLOR = '#7C4DFF'
 // onto whatever `initialColor` was on the very first render and never reads the prop again, same
 // as a real context provider's `useState(() => initialProp)`. Mount it early with a placeholder
 // and patch the real color into its prop later, as the "Without Gate" card below does, and it
-// can't work — the state already locked onto the placeholder, permanently, even though the prop
+// can't work - the state already locked onto the placeholder, permanently, even though the prop
 // technically changed underneath it.
 const LockingColorProvider = ({ initialColor, children }: { initialColor: string; children: (color: string) => ReactNode }) => {
   const [color] = useState(() => initialColor)

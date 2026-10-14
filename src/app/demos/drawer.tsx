@@ -82,7 +82,7 @@ const ExpandableSheetContent = () => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
   // The top safe-area inset (status bar/notch) only matters once the sheet is actually reaching the
-  // screen's top edge — wasted space while merely resting at 50%. expandProgress (0 at rest, 1 once
+  // screen's top edge - wasted space while merely resting at 50%. expandProgress (0 at rest, 1 once
   // fully expanded) scales it in smoothly as the handle is dragged, instead of either always paying
   // for it or snapping it in abruptly right at the end. The bottom inset doesn't need this: the
   // sheet's bottom edge sits flush against the screen's bottom at any size, rest or expanded, so it
@@ -100,8 +100,8 @@ const ExpandableSheetContent = () => {
       </Text>
       <List.Item title='Drag the handle up' description='Past a third of the way there, or a fast flick, commits to fully open; otherwise it springs back to rest.' left={(props) => <List.Icon {...props} icon='drag-horizontal' />} />
       <List.Item title='Only visible once expanded' description='The panel always renders at maxHeight; at rest most of it just sits off-screen below.' left={(props) => <List.Icon {...props} icon='arrow-expand-vertical' />} />
-      <List.Item title='Percentage or plain numbers' description="height/maxHeight (and width/maxWidth) both take either — this sheet's 50%/100% could just as well be 300/800." left={(props) => <List.Icon {...props} icon='percent-outline' />} />
-      <List.Item title='Safe-area top inset, only when it matters' description='The status bar/notch inset fades in as you drag toward fully open, via expandProgress from useDrawer() — no wasted padding at rest.' left={(props) => <List.Icon {...props} icon='cellphone-arrow-down' />} />
+      <List.Item title='Percentage or plain numbers' description="height/maxHeight (and width/maxWidth) both take either: this sheet's 50%/100% could just as well be 300/800." left={(props) => <List.Icon {...props} icon='percent-outline' />} />
+      <List.Item title='Safe-area top inset, only when it matters' description='The status bar/notch inset fades in as you drag toward fully open, via expandProgress from useDrawer(), no wasted padding at rest.' left={(props) => <List.Icon {...props} icon='cellphone-arrow-down' />} />
     </Animated.View>
   )
 }

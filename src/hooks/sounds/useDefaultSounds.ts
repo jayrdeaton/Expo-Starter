@@ -1,6 +1,6 @@
 import { useAudioPool } from '@rific/feedback-press/audio'
 
-// Relative, not the @/ alias — static require() calls Metro's asset plugin has to resolve at
+// Relative, not the @/ alias - static require() calls Metro's asset plugin has to resolve at
 // bundle time, same convention as every other local-asset require in this codebase.
 const CLICK_SOUND = require('../../../assets/sounds/click.wav')
 const POP_SOUND = require('../../../assets/sounds/pop.wav')

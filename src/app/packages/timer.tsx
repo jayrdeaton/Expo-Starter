@@ -4,7 +4,7 @@ import { Divider, Surface, Text, useTheme } from 'react-native-paper'
 
 import { safeBack } from '@/utils/navigation'
 
-const FEATURES = ['Smooth SVG ring animation driven by React Native Animated', 'Start / stop controlled by a timestamp string, no manual animation state', 'Resume mid-timer with startProgress (0–1)', 'Configurable color, radius, and stroke width', 'Children rendered at the center of the ring, display a countdown, icon, or label', 'onStart / onStop callbacks for side-effects', 'Uses native driver for 60 fps animation without JS thread', 'Zero dependencies beyond react-native-svg']
+const FEATURES = ['Smooth SVG ring animation driven by React Native Animated', 'Start / stop controlled by a timestamp string, no manual animation state', 'Resume mid-timer with startProgress (0-1)', 'Configurable color, radius, and stroke width', 'Children rendered at the center of the ring, display a countdown, icon, or label', 'onStart / onStop callbacks for side-effects', 'Uses native driver for 60 fps animation without JS thread', 'Zero dependencies beyond react-native-svg']
 
 const PROPS = [
   { name: 'started', type: 'string | null', desc: 'Required. ISO timestamp string. Set to start; set to null to stop and reset.' },
@@ -12,7 +12,7 @@ const PROPS = [
   { name: 'color', type: 'string', desc: 'Required. Stroke color of the progress ring.' },
   { name: 'radius', type: 'number', desc: 'Required. Radius of the ring in pixels.' },
   { name: 'width', type: 'number', desc: 'Stroke width. Default: 6.' },
-  { name: 'startProgress', type: 'number', desc: 'Initial progress (0–1) for resuming a mid-timer. Default: 0.' },
+  { name: 'startProgress', type: 'number', desc: 'Initial progress (0-1) for resuming a mid-timer. Default: 0.' },
   { name: 'onStart', type: '() => void', desc: 'Called when the animation begins.' },
   { name: 'onStop', type: '() => void', desc: 'Called when the animation finishes naturally.' },
   { name: 'children', type: 'ReactNode', desc: 'Rendered at the center of the ring (e.g., countdown text).' },
