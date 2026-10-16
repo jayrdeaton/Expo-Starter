@@ -83,7 +83,7 @@ src/
 
 ## Icons and splash (2026-10-13)
 
-The asset names and `app.json` config match the games (AirHockey, BoxHockey, Hangman, LightCycles, Pong, Snake, Solitaire): `assets/images/icon-light.png`, `icon-dark.png`, `splash-light.png` and `splash-dark.png`. `expo.icon` and `web.favicon` are `icon-dark.png`, `ios.icon` is the dark/light pair, there is no Android `adaptiveIcon`, and the splash is `imageWidth` 200 with the light/dark images. The icons are opaque 1024px squares on `#FAFAFA` (light) and `#050505` (dark), the same as the games. Each splash is its icon's art on a transparent background, and the plugin's `backgroundColor`s are those same two colors. A new app's own icons should keep those backgrounds, so the splash colors never need to change.
+The asset names and `app.json` config match the games (AirHockey, BoxHockey, Hangman, LightCycles, Pong, Snake, Solitaire): `assets/images/icon-light.png`, `icon-dark.png`, `splash-light.png` and `splash-dark.png`. `expo.icon` is `icon-dark.png`, `web.favicon` is `splash-dark.png`, `ios.icon` is the dark/light pair, there is no Android `adaptiveIcon`, and the splash is `imageWidth` 200 with the light/dark images. The favicon is the transparent splash art, not the opaque icon, because it looks better in a browser tab (2026-10-16), so `splash-dark.png` has to read on both light and dark tabs. The icons are opaque 1024px squares on `#FAFAFA` (light) and `#050505` (dark), the same as the games. Each splash is its icon's art on a transparent background, and the plugin's `backgroundColor`s are those same two colors. A new app's own icons should keep those backgrounds, so the splash colors never need to change.
 
 ## Xcode 26 image pin (remove on Expo SDK 58)
 
