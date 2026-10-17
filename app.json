@@ -2,7 +2,7 @@
   "expo": {
     "name": "Expo Starter",
     "slug": "ExpoStarter",
-    "version": "0.0.0",
+    "version": "0.1.0",
     "scheme": "app",
     "description": "An Expo starter project",
     "orientation": "portrait",

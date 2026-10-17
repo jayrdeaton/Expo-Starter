@@ -1,6 +1,6 @@
 {
   "name": "expo-starter",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "A lean, production-ready Expo starter with file-based routing, Redux, theming, and a curated set of @rific packages pre-wired.",
   "type": "commonjs",
