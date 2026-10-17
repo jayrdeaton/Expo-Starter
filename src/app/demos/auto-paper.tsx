@@ -1,4 +1,4 @@
-import { AppearancePicker, AutoAppearancePicker, AutoPalettePicker, ColorPicker, Dialog, HarmonyPicker, Menu, PalettePicker, resolveSeedColor, useAutoPaperTheme, useThemeSettings } from '@rific/auto-paper'
+import { AppearancePicker, AutoAppearancePicker, AutoPalettePicker, type AutoPaperTheme, ColorPicker, Dialog, FadingScrollView, HarmonyPicker, Menu, PalettePicker, resolveSeedColor, useAutoPaperTheme, useThemeSettings } from '@rific/auto-paper'
 import { Button, Switch } from '@rific/feedback-press'
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
 import { useRouter } from 'expo-router'
@@ -7,6 +7,25 @@ import { Platform, StyleSheet, View } from 'react-native'
 import { Divider, Surface, Text } from 'react-native-paper'
 
 import { safeBack } from '@/utils/navigation'
+
+// Every color role the theme exposes, listed under Live Theme Colors and in the Fading Scroll View
+// dialog.
+const COLOR_ROLES = ['primary', 'onPrimary', 'primaryContainer', 'onPrimaryContainer', 'secondary', 'onSecondary', 'secondaryContainer', 'onSecondaryContainer', 'tertiary', 'onTertiary', 'tertiaryContainer', 'onTertiaryContainer', 'error', 'onError', 'errorContainer', 'onErrorContainer', 'success', 'onSuccess', 'successContainer', 'onSuccessContainer', 'warning', 'onWarning', 'warningContainer', 'onWarningContainer', 'danger', 'onDanger', 'dangerContainer', 'onDangerContainer', 'background', 'onBackground', 'surface', 'onSurface', 'surfaceVariant', 'onSurfaceVariant', 'surfaceDisabled', 'onSurfaceDisabled', 'inverseSurface', 'inverseOnSurface', 'inversePrimary', 'outline', 'outlineVariant', 'shadow', 'scrim', 'backdrop'] as const satisfies readonly (keyof AutoPaperTheme['colors'])[]
+
+const ColorRow = ({ hex, role }: { hex: string; role: string }) => {
+  const theme = useAutoPaperTheme()
+  return (
+    <View style={styles.colorRow}>
+      <View style={[styles.colorDot, { backgroundColor: hex }]} />
+      <Text variant='bodySmall' style={[styles.fill, { color: theme.colors.onSurfaceVariant }]}>
+        {role}
+      </Text>
+      <Text variant='bodySmall' style={{ color: theme.colors.onSurfaceVariant }}>
+        {hex}
+      </Text>
+    </View>
+  )
+}
 
 const AutoPaperDemo = () => {
   const router = useRouter()
@@ -19,6 +38,7 @@ const AutoPaperDemo = () => {
   } = useThemeSettings()
 
   const [dialogVisible, setDialogVisible] = useState(false)
+  const [fadingDialogVisible, setFadingDialogVisible] = useState(false)
   const [menuVisible, setMenuVisible] = useState(false)
 
   // ColorPicker/PalettePicker only take a single seed string. Nothing in this app puts the global
@@ -126,6 +146,30 @@ const AutoPaperDemo = () => {
             </Dialog.Content>
             <Dialog.Actions>
               <Button onPress={() => setDialogVisible(false)}>Close</Button>
+            </Dialog.Actions>
+          </Dialog>
+
+          <Divider style={styles.divider} />
+          <Text variant='titleMedium' style={styles.sectionLabel}>
+            Fading Scroll View
+          </Text>
+          <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
+            FadingScrollView fades its content out at an edge while there is more to scroll past it: at the bottom until the end, the cue that rows continue under the Done button, and at the top once scrolled. It masks the content instead of painting over it, so a blurred dialog stays one surface. iOS and Android need maskedView passed to Provider (this app does, in Theme.tsx); web needs nothing.
+          </Text>
+          <Button mode='outlined' style={styles.fadingButton} onPress={() => setFadingDialogVisible(true)}>
+            Open Scrolling Dialog
+          </Button>
+          <Dialog visible={fadingDialogVisible} onDismiss={() => setFadingDialogVisible(false)}>
+            <Dialog.Title>Theme Colors</Dialog.Title>
+            <Dialog.ScrollArea>
+              <FadingScrollView style={styles.fadingScroll}>
+                {COLOR_ROLES.map((role) => (
+                  <ColorRow key={role} role={role} hex={theme.colors[role]} />
+                ))}
+              </FadingScrollView>
+            </Dialog.ScrollArea>
+            <Dialog.Actions>
+              <Button onPress={() => setFadingDialogVisible(false)}>Done</Button>
             </Dialog.Actions>
           </Dialog>
 
@@ -242,61 +286,8 @@ const AutoPaperDemo = () => {
           <Text variant='titleMedium' style={styles.sectionLabel}>
             Live Theme Colors
           </Text>
-          {[
-            { label: 'primary', value: theme.colors.primary },
-            { label: 'onPrimary', value: theme.colors.onPrimary },
-            { label: 'primaryContainer', value: theme.colors.primaryContainer },
-            { label: 'onPrimaryContainer', value: theme.colors.onPrimaryContainer },
-            { label: 'secondary', value: theme.colors.secondary },
-            { label: 'onSecondary', value: theme.colors.onSecondary },
-            { label: 'secondaryContainer', value: theme.colors.secondaryContainer },
-            { label: 'onSecondaryContainer', value: theme.colors.onSecondaryContainer },
-            { label: 'tertiary', value: theme.colors.tertiary },
-            { label: 'onTertiary', value: theme.colors.onTertiary },
-            { label: 'tertiaryContainer', value: theme.colors.tertiaryContainer },
-            { label: 'onTertiaryContainer', value: theme.colors.onTertiaryContainer },
-            { label: 'error', value: theme.colors.error },
-            { label: 'onError', value: theme.colors.onError },
-            { label: 'errorContainer', value: theme.colors.errorContainer },
-            { label: 'onErrorContainer', value: theme.colors.onErrorContainer },
-            { label: 'success', value: theme.colors.success },
-            { label: 'onSuccess', value: theme.colors.onSuccess },
-            { label: 'successContainer', value: theme.colors.successContainer },
-            { label: 'onSuccessContainer', value: theme.colors.onSuccessContainer },
-            { label: 'warning', value: theme.colors.warning },
-            { label: 'onWarning', value: theme.colors.onWarning },
-            { label: 'warningContainer', value: theme.colors.warningContainer },
-            { label: 'onWarningContainer', value: theme.colors.onWarningContainer },
-            { label: 'danger', value: theme.colors.danger },
-            { label: 'onDanger', value: theme.colors.onDanger },
-            { label: 'dangerContainer', value: theme.colors.dangerContainer },
-            { label: 'onDangerContainer', value: theme.colors.onDangerContainer },
-            { label: 'background', value: theme.colors.background },
-            { label: 'onBackground', value: theme.colors.onBackground },
-            { label: 'surface', value: theme.colors.surface },
-            { label: 'onSurface', value: theme.colors.onSurface },
-            { label: 'surfaceVariant', value: theme.colors.surfaceVariant },
-            { label: 'onSurfaceVariant', value: theme.colors.onSurfaceVariant },
-            { label: 'surfaceDisabled', value: theme.colors.surfaceDisabled },
-            { label: 'onSurfaceDisabled', value: theme.colors.onSurfaceDisabled },
-            { label: 'inverseSurface', value: theme.colors.inverseSurface },
-            { label: 'inverseOnSurface', value: theme.colors.inverseOnSurface },
-            { label: 'inversePrimary', value: theme.colors.inversePrimary },
-            { label: 'outline', value: theme.colors.outline },
-            { label: 'outlineVariant', value: theme.colors.outlineVariant },
-            { label: 'shadow', value: theme.colors.shadow },
-            { label: 'scrim', value: theme.colors.scrim },
-            { label: 'backdrop', value: theme.colors.backdrop }
-          ].map(({ label, value: hex }) => (
-            <View key={label} style={styles.colorRow}>
-              <View style={[styles.colorDot, { backgroundColor: hex }]} />
-              <Text variant='bodySmall' style={[styles.fill, { color: theme.colors.onSurfaceVariant }]}>
-                {label}
-              </Text>
-              <Text variant='bodySmall' style={{ color: theme.colors.onSurfaceVariant }}>
-                {hex}
-              </Text>
-            </View>
+          {COLOR_ROLES.map((role) => (
+            <ColorRow key={role} role={role} hex={theme.colors[role]} />
           ))}
         </ScrollView>
       </ScrollViewProvider>
@@ -315,6 +306,8 @@ const styles = StyleSheet.create({
   container: { paddingHorizontal: 16, paddingTop: 16 },
   desc: { marginTop: 0 },
   divider: { marginVertical: 20 },
+  fadingButton: { alignSelf: 'flex-start' },
+  fadingScroll: { maxHeight: 320 },
   fill: { flex: 1 },
   hint: { marginBottom: 12 },
   monospaceText: { fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },

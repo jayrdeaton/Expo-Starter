@@ -62,6 +62,26 @@ describe('store', () => {
       expect(store.getState().sound.enabled).toBe(!__DEV__)
     })
 
+    // A production bundle (__DEV__ false) is the only place web and native defaults differ, so this
+    // loads a fresh copy of the store under one, once per platform.
+    it.each([
+      ['ios', true],
+      ['web', false]
+    ])('defaults sound to %s in production: %s', (os, enabled) => {
+      const globals = global as unknown as { __DEV__: boolean }
+      const dev = globals.__DEV__
+      globals.__DEV__ = false
+      try {
+        jest.isolateModules(() => {
+          jest.replaceProperty(jest.requireActual<typeof import('react-native')>('react-native').Platform, 'OS', os as 'ios' | 'web')
+          const { rootReducer: freshReducer } = jest.requireActual<typeof import('../../redux/store')>('../../redux/store')
+          expect(freshReducer(undefined, { type: '@@init' }).sound.enabled).toBe(enabled)
+        })
+      } finally {
+        globals.__DEV__ = dev
+      }
+    })
+
     it('initializes settings defaults', () => {
       expect(store.getState().settings.debug).toBe(false)
     })

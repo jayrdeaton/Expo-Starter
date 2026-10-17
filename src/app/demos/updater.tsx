@@ -3,9 +3,10 @@ import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-
 import { useUpdateErrorToast } from '@rific/toaster'
 import { useUpdater } from '@rific/updater'
 import { useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { Platform, StyleSheet, View } from 'react-native'
 import { Chip, Divider, Surface, Text, useTheme } from 'react-native-paper'
 
+import { WebNote } from '@/components/WebNote'
 import { release } from '@/constants/release'
 import { safeBack } from '@/utils/navigation'
 
@@ -40,6 +41,9 @@ const INFO_ITEMS = [
   }
 ]
 
+// OTA updates don't exist on web, so the manual check is off there.
+const isWeb = Platform.OS === 'web'
+
 const UpdaterDemo = () => {
   const theme = useTheme()
   const [info, setInfo] = useState<{ title: string; message: string } | null>(null)
@@ -58,6 +62,7 @@ const UpdaterDemo = () => {
           <Text variant='bodyMedium' style={[styles.desc, { color: theme.colors.onSurfaceVariant }]}>
             OTA update hook for Expo apps. Checks for updates on launch and on every foreground resume, and prompts to restart as soon as one&apos;s found. Exposes a manual check function, an optional confirmation callback before applying the update, and an onInfo callback for check()&apos;s informational messages: pass autoPrompt: false to stage updates silently instead.
           </Text>
+          <WebNote style={styles.webNote}>Off on web: OTA updates only exist in the iOS and Android apps, so Check for Update is turned off here.</WebNote>
 
           <Divider style={styles.divider} />
           <Text variant='titleMedium' style={styles.sectionLabel}>
@@ -67,7 +72,7 @@ const UpdaterDemo = () => {
             <Chip icon={checking ? 'loading' : 'check-circle-outline'} selected={checking}>
               {checking ? 'Checking…' : 'Idle'}
             </Chip>
-            <Chip icon={__DEV__ ? 'cloud-off-outline' : 'cloud-outline'}>{__DEV__ ? 'Checks disabled (dev)' : 'Manual checks only'}</Chip>
+            <Chip icon={__DEV__ || isWeb ? 'cloud-off-outline' : 'cloud-outline'}>{isWeb ? 'Not on web' : __DEV__ ? 'Checks disabled (dev)' : 'Manual checks only'}</Chip>
             <Chip icon='tag-outline'>OTA v{release.otaVersion}</Chip>
           </View>
 
@@ -75,7 +80,7 @@ const UpdaterDemo = () => {
           <Text variant='titleMedium' style={styles.sectionLabel}>
             Manual Check
           </Text>
-          <Button mode='contained' onPress={check} disabled={checking} loading={checking}>
+          <Button mode='contained' onPress={check} disabled={checking || isWeb} loading={checking}>
             {checking ? 'Checking…' : 'Check for Update'}
           </Button>
 
@@ -136,7 +141,8 @@ const styles = StyleSheet.create({
   infoItemDesc: { marginTop: 4 },
   infoItemFirst: { borderTopWidth: 0 },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  sectionLabel: { marginBottom: 12 }
+  sectionLabel: { marginBottom: 12 },
+  webNote: { marginTop: 8 }
 })
 
 export default UpdaterDemo

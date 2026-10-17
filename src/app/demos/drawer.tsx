@@ -1,4 +1,4 @@
-import { combineDrawerProviders, createDrawer } from '@rific/drawer'
+import { combineDrawerProviders, createDrawer, useDrawerSize } from '@rific/drawer'
 import { Button, IconButton, Switch } from '@rific/feedback-press'
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
 import { Stack } from 'expo-router'
@@ -10,7 +10,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { safeBack } from '@/utils/navigation'
 
-const nav = createDrawer({ side: 'left', width: 280 })
+const NAV_WIDTH = 280
+const nav = createDrawer({ side: 'left', width: NAV_WIDTH })
 // blur: true here demonstrates @rific/auto-paper's BlurView on the panel surface, see the
 // <DrawerProvider autoPaper={AutoPaper}> in src/components/Providers.tsx, which is what actually
 // makes that render as a real blur instead of the solid-fill fallback.
@@ -27,6 +28,8 @@ const NavDrawerContent = () => {
   const { close } = nav.useDrawer()
   const theme = useTheme()
   const insets = useSafeAreaInsets()
+  // The same geometry the panel resolves for itself: NAV_WIDTH, capped at the window's width.
+  const { effectiveSize } = useDrawerSize('left', NAV_WIDTH)
 
   return (
     <View style={[styles.drawerContent, { backgroundColor: theme.colors.surface, paddingTop: insets.top, paddingBottom: insets.bottom }]}>
@@ -37,6 +40,9 @@ const NavDrawerContent = () => {
       <List.Item title='Home' left={(props) => <List.Icon {...props} icon='home-outline' />} onPress={close} />
       <List.Item title='Explore' left={(props) => <List.Icon {...props} icon='compass-outline' />} onPress={close} />
       <List.Item title='Favorites' left={(props) => <List.Icon {...props} icon='heart-outline' />} onPress={close} />
+      <Text variant='bodySmall' style={[styles.sheetHint, { color: theme.colors.onSurfaceVariant }]}>
+        {`This panel is ${effectiveSize}pt wide: useDrawerSize('left', ${NAV_WIDTH}) resolves the same size the drawer does, capped at the window.`}
+      </Text>
     </View>
   )
 }
@@ -115,7 +121,8 @@ const FEATURES = [
   'One createDrawer() call per instance: a left nav drawer, a right settings drawer, and a bottom sheet all stay fully independent',
   'combineDrawerProviders() flattens nesting multiple drawers into a single wrapper',
   'contentSize sizes the panel to its content along the main axis instead of a fixed width/height, and animates smoothly if that size changes',
-  'width/height accept a percentage string, resolved against the window size, instead of a plain pixel number',
+  'width/height accept a percentage string, resolved against the window size, instead of a plain pixel number. Either way the size is capped at the window, so a fixed width: 380 drawer fills a 360pt-wide phone exactly instead of running off its far edge',
+  "useDrawerSize() resolves the same capped geometry Drawer uses (effectiveSize, closedOffset, ...), for laying out content sized to the panel (the nav drawer above shows its own width) or seeding a standalone Drawer/DrawerEdgeSwipe pair's translateOffset",
   'maxHeight/maxWidth turn the panel into an expandable sheet: opens to width/height as usual, but the same drag handle can pull it open further, up to this ceiling, instead of just toggling open/closed',
   'useDrawer() exposes expandProgress, a live 0-1 SharedValue tracking how expanded the sheet currently is, for content that should only react once the panel is genuinely at its full extent (open the expandable sheet above)',
   'Built-in swipe-to-dismiss drag handle on the panel edge closest to closed, floating just outside the panel rather than claiming space inside it',
@@ -126,7 +133,7 @@ const FEATURES = [
 
 const PROPS = [
   { name: 'side', type: "'left' | 'right' | 'top' | 'bottom'", desc: "Which edge the drawer anchors to and swipes in from. Default: 'left'." },
-  { name: 'width / height', type: "number | '${number}%'", desc: 'Panel size along the main axis: width for left/right, height for top/bottom. A percentage resolves against the window size. Default: 300.' },
+  { name: 'width / height', type: "number | '${number}%'", desc: "Panel size along the main axis: width for left/right, height for top/bottom. A percentage resolves against the window size. Either way it's capped at the window's size along that axis. Default: 300." },
   { name: 'maxWidth / maxHeight', type: "number | '${number}%'", desc: "Turns the panel into an expandable sheet: the drag handle can pull it open past width/height, up to this ceiling. Omit for today's plain open/closed toggle." },
   { name: 'expandProgress', type: 'SharedValue<number>', desc: "useDrawer()'s own field, not a createDrawer() option: 0 at rest, 1 fully expanded, live as the handle drags or springs. Always 1 without maxHeight/maxWidth." },
   { name: 'contentSize', type: 'boolean', desc: 'Sizes the panel to its content instead of a fixed width/height. Default: false.' },
@@ -140,7 +147,7 @@ const PROPS = [
 ]
 
 const USAGE = `import * as AutoPaper from '@rific/auto-paper'
-import { createDrawer, combineDrawerProviders, DrawerProvider } from '@rific/drawer'
+import { createDrawer, combineDrawerProviders, DrawerProvider, useDrawerSize } from '@rific/drawer'
 
 const nav = createDrawer({ side: 'left', width: 300 })
 const settings = createDrawer({ side: 'right', width: 320, blur: true })
@@ -166,7 +173,10 @@ const AllDrawersProvider = combineDrawerProviders(
 
 // anywhere else:
 const { isOpen, open, close } = nav.useDrawer()
-<IconButton icon="menu" onPress={open} />`
+<IconButton icon="menu" onPress={open} />
+
+// the panel's resolved rest size (capped at the window), e.g. for content sized to it:
+const { effectiveSize } = useDrawerSize('left', 300)`
 
 // Rendered as AllDrawersProvider's child (not its parent) so nav.useDrawer()/settings.useDrawer()
 // actually resolve the real Provider values instead of the no-op default context.

@@ -79,6 +79,19 @@ describe('Theme', () => {
     expect(mockProviderCalls[0]).toEqual(expect.objectContaining({ initialValue: expect.objectContaining({ color: '#ff0000' }) }))
   })
 
+  // The status bar is set per screen by the root Stack (see _layout.tsx), so no React Native
+  // StatusBar may mount: with UIViewControllerBasedStatusBarAppearance on, one logs an error.
+  it("turns off auto-paper's StatusBar and injects maskedView for FadingScrollView", async () => {
+    await render(
+      <ReduxProvider store={makeStore()}>
+        <Theme>
+          <Text>child</Text>
+        </Theme>
+      </ReduxProvider>
+    )
+    expect(mockProviderCalls[0]).toEqual(expect.objectContaining({ maskedView: expect.anything(), statusBar: false }))
+  })
+
   it('passes an onReady callback to auto-paper Provider', async () => {
     await render(
       <ReduxProvider store={makeStore()}>

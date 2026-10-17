@@ -4,7 +4,11 @@ import { useCallback, useState } from 'react'
 import { Keyboard, Platform, StyleSheet, View } from 'react-native'
 import { Text, TextInput, useTheme } from 'react-native-paper'
 
+import { WebNote } from '@/components/WebNote'
 import { safeBack } from '@/utils/navigation'
+
+// react-native-keyboard-controller has no web version, so neither switch does anything there.
+const isWeb = Platform.OS === 'web'
 
 const KeyboardDemo = () => {
   const theme = useTheme()
@@ -20,22 +24,18 @@ const KeyboardDemo = () => {
           <Text variant='bodyMedium' style={[styles.desc, { color: theme.colors.onSurfaceVariant }]}>
             When enabled, the scroll view adds the keyboard height to its bottom content inset, so focused fields near the bottom of the form stay above the keyboard instead of getting hidden behind it.
           </Text>
-          {Platform.OS === 'web' && (
-            <Text variant='bodySmall' style={[styles.webNote, { color: theme.colors.error }]}>
-              keyboardAware has no effect on web. Try this demo on iOS or Android to see the keyboard push content out of the way.
-            </Text>
-          )}
+          <WebNote style={styles.webNote}>Off on web: react-native-keyboard-controller has no web version, so both switches need the iOS or Android app to move anything.</WebNote>
 
           <View style={[styles.row, footerAboveKeyboard && styles.dimmed]}>
             <Text variant='bodyMedium'>Keyboard aware</Text>
-            <Switch accessibilityLabel='Keyboard aware' value={keyboardAware} onValueChange={setKeyboardAware} disabled={footerAboveKeyboard} />
+            <Switch accessibilityLabel='Keyboard aware' value={keyboardAware} onValueChange={setKeyboardAware} disabled={footerAboveKeyboard || isWeb} />
           </View>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
             Has no effect while Footer above keyboard is on, since the floating footer already reserves the keyboard height.
           </Text>
           <View style={styles.row}>
             <Text variant='bodyMedium'>Footer above keyboard</Text>
-            <Switch accessibilityLabel='Footer above keyboard' value={footerAboveKeyboard} onValueChange={setFooterAboveKeyboard} />
+            <Switch accessibilityLabel='Footer above keyboard' value={footerAboveKeyboard} onValueChange={setFooterAboveKeyboard} disabled={isWeb} />
           </View>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
             The footer below holds Cancel and Done. With this on, the fixed footer floats above the keyboard instead of getting covered by it, so these stay reachable without dismissing the keyboard first. Pressing either one blurs the focused field, so the keyboard animates away.

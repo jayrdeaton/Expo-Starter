@@ -260,6 +260,17 @@ const ScrollViewDemo = () => {
 
           <Divider style={styles.divider} />
           <Text variant='titleMedium' style={styles.sectionLabel}>
+            Persistent Tab Bar
+          </Text>
+          <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
+            ScrollViewChromeProvider, mounted above a Tabs navigator, makes the app&apos;s own tab bar and each screen&apos;s footer one rigid piece that hides and reveals with scroll. useScrollViewChromePin holds it in place.
+          </Text>
+          <Button mode='outlined' onPress={() => router.push('/demos/scroll-view-chrome')}>
+            Open example
+          </Button>
+
+          <Divider style={styles.divider} />
+          <Text variant='titleMedium' style={styles.sectionLabel}>
             Keyboard Aware
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>

@@ -1,0 +1,9 @@
+{
+  "git": {
+    "deploymentEnabled": false
+  },
+  "buildCommand": "npx expo export -p web",
+  "outputDirectory": "dist",
+  "framework": null,
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}

@@ -1,4 +1,5 @@
-import { Button } from '@rific/feedback-press'
+import { useThemeSettings } from '@rific/auto-paper'
+import { Button, Switch } from '@rific/feedback-press'
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
 import { LEVEL_COLORS, useToast } from '@rific/toaster'
 import { StyleSheet, View } from 'react-native'
@@ -9,6 +10,10 @@ import { safeBack } from '@/utils/navigation'
 const ToasterDemo = () => {
   const theme = useTheme()
   const toast = useToast()
+  const {
+    settings: { blur },
+    set
+  } = useThemeSettings()
 
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
@@ -16,7 +21,7 @@ const ToasterDemo = () => {
         <ScrollViewHeader backAction={safeBack} title='Toaster' caption='@rific/toaster' />
         <ScrollView contentContainerStyle={styles.container}>
           <Text variant='bodyMedium' style={[styles.desc, { color: theme.colors.onSurfaceVariant }]}>
-            Stacking, animated toast notifications with swipe-to-dismiss, a capped visible limit, and a history drawer. Toasts are triggered imperatively via a hook from anywhere in your component tree.
+            Stacking, animated toast notifications with swipe-to-dismiss (sideways, off the edge, or a flick), a capped visible limit, and a history drawer. Toasts are triggered imperatively via a hook from anywhere in your component tree.
           </Text>
 
           <Divider style={styles.divider} />
@@ -108,6 +113,32 @@ const ToasterDemo = () => {
 
           <Divider style={styles.divider} />
           <Text variant='titleMedium' style={styles.sectionLabel}>
+            Swipe to Dismiss
+          </Text>
+          <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
+            Swipe a toast sideways past 30% of its width, or back down off the bottom edge past half its height. A quick flick dismisses it however short the swipe; anything less springs back.
+          </Text>
+          <Button mode='outlined' icon='gesture-swipe' style={styles.start} onPress={() => toast.info('Swipe me away', 'Sideways, down, or a quick flick either way')} compact>
+            Fire a Toast to Swipe
+          </Button>
+
+          <Divider style={styles.divider} />
+          <Text variant='titleMedium' style={styles.sectionLabel}>
+            Card and Type
+          </Text>
+          <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
+            This app&apos;s Toaster (in Providers.tsx) passes a Card that draws each toast on auto-paper&apos;s BlurView, so toasts frost like Dialog and Menu while the theme&apos;s blur is on, and labelStyle/captionStyle from the theme&apos;s bodyMedium/bodySmall, so a fontFamily set on auto-paper&apos;s Provider reaches toasts too. Toggle blur and fire one over this text to compare.
+          </Text>
+          <View style={styles.settingRow}>
+            <Text variant='bodyMedium'>Blur enabled</Text>
+            <Switch accessibilityLabel='Blur enabled' value={blur} onValueChange={(v) => set({ blur: v })} />
+          </View>
+          <Button mode='outlined' icon='blur' style={styles.start} onPress={() => toast.success(`Blur ${blur ? 'on' : 'off'}`, `This card is drawn ${blur ? 'frosted' : 'solid'}, in the theme's type`)} compact>
+            Fire a Toast
+          </Button>
+
+          <Divider style={styles.divider} />
+          <Text variant='titleMedium' style={styles.sectionLabel}>
             History
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
@@ -138,7 +169,9 @@ const styles = StyleSheet.create({
   hint: { marginBottom: 12 },
   item: { marginBottom: 12 },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  sectionLabel: { marginBottom: 8 }
+  sectionLabel: { marginBottom: 8 },
+  settingRow: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
+  start: { alignSelf: 'flex-start' }
 })
 
 export default ToasterDemo

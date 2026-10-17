@@ -1,4 +1,5 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
+import MaskedView from '@react-native-masked-view/masked-view'
 import { Provider, themeActions, type ThemeSettings, useThemeBridgeProps } from '@rific/auto-paper'
 import * as ExpoBlur from 'expo-blur'
 import { useFonts } from 'expo-font'
@@ -32,8 +33,14 @@ export const Theme = ({ children }: ThemeProps) => {
 
   const bridgeProps = useThemeBridgeProps({ initialValue: settings, onChange, onReady })
 
+  // statusBar={false}: the status bar is styled per screen by the root Stack's screenOptions (see
+  // _layout.tsx), never by React Native's StatusBar. An app linked against the iOS 27 SDK can't set
+  // the status bar app-wide, which is the only thing that component does on iOS, and with
+  // UIViewControllerBasedStatusBarAppearance on (app.json) a mounted StatusBar logs an error.
+  // maskedView is what lets FadingScrollView fade its content at the edges on iOS and Android
+  // (without it, it just scrolls; web needs nothing).
   return (
-    <Provider expoBlur={ExpoBlur} {...bridgeProps}>
+    <Provider expoBlur={ExpoBlur} maskedView={MaskedView} statusBar={false} {...bridgeProps}>
       {children}
     </Provider>
   )

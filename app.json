@@ -26,7 +26,7 @@
       "bundleIdentifier": "com.infinitetoken.ExpoStarter",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "UIViewControllerBasedStatusBarAppearance": false
+        "UIViewControllerBasedStatusBarAppearance": true
       },
       "icon": {
         "dark": "./assets/images/icon-dark.png",

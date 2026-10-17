@@ -2,13 +2,23 @@ import { AppbarAction, Button, Card, Checkbox, Chip, FAB, IconButton, SegmentedB
 import { ScrollView, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view'
 import { NotificationFeedbackType } from 'expo-haptics'
 import { useCallback, useRef, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { Platform, StyleSheet, View } from 'react-native'
 import { Divider, Text, useTheme } from 'react-native-paper'
 
+import { WebNote } from '@/components/WebNote'
 import { useFeedbackSounds } from '@/hooks/useFeedbackSounds'
+import { hapticsSupported } from '@/utils/haptics'
 import { safeBack } from '@/utils/navigation'
 
 const HOLD_KEYS = ['A', 'B', 'C'] as const
+
+// How far the Hit Slop demo's touch area reaches past the 40pt button: 12 makes a 64pt target.
+const SLOP = 12
+// react-native-paper's IconButton is a 40pt circle inside a 6pt margin, so its box starts 6pt into
+// the View wrapping it.
+const ICON_BUTTON_MARGIN = 6
+// Browsers ignore hitSlop, so the Hit Slop demo's buttons are off on web.
+const isWeb = Platform.OS === 'web'
 
 const FeedbackPressDemo = () => {
   const theme = useTheme()
@@ -39,6 +49,7 @@ const FeedbackPressDemo = () => {
   const [checked, setChecked] = useState(true)
   const [switchOn, setSwitchOn] = useState(true)
   const [segment, setSegment] = useState('day')
+  const [slopPresses, setSlopPresses] = useState({ plain: 0, slop: 0 })
 
   const [count, setCount] = useState(0)
   const increment = useCallback(() => setCount((c) => c + 1), [])
@@ -101,8 +112,11 @@ const FeedbackPressDemo = () => {
           </Text>
           <View style={styles.settingRow}>
             <Text variant='bodyMedium'>Haptics</Text>
-            <Switch accessibilityLabel='Haptics' value={hapticSettings.vibrate} onValueChange={(v) => setHapticSettings({ vibrate: v })} />
+            <Switch accessibilityLabel='Haptics' value={hapticsSupported && hapticSettings.vibrate} onValueChange={(v) => setHapticSettings({ vibrate: v })} disabled={!hapticsSupported} />
           </View>
+          <WebNote visible={!hapticsSupported} style={styles.hint}>
+            Haptics need a phone: the iOS or Android app, or Chrome on Android. This browser can&apos;t vibrate, so the haptic controls on this screen are off.
+          </WebNote>
           <View style={styles.settingRow}>
             <Text variant='bodyMedium'>Sound</Text>
             <Switch accessibilityLabel='Sound' value={soundSettings.enabled} onValueChange={(v) => setSoundSettings({ enabled: v })} />
@@ -115,6 +129,9 @@ const FeedbackPressDemo = () => {
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
             Tap to feel each vibration pattern. These use useVibration&apos;s force* variants, so they fire even with the Haptics switch above off: the Notification Types below respect it.
           </Text>
+          <WebNote visible={!hapticsSupported} style={styles.hint}>
+            Off in this browser, along with the Notification Types below: it can&apos;t vibrate.
+          </WebNote>
           <View style={styles.row}>
             {[
               { label: 'Short', fn: () => vibration.forceShort() },
@@ -122,7 +139,7 @@ const FeedbackPressDemo = () => {
               { label: 'Long', fn: () => vibration.forceLong() },
               { label: 'Double', fn: () => vibration.forceDouble() }
             ].map((h) => (
-              <Button key={h.label} mode='outlined' hapticDisabled soundDisabled onPress={h.fn} compact>
+              <Button key={h.label} mode='outlined' hapticDisabled soundDisabled onPress={h.fn} disabled={!hapticsSupported} compact>
                 {h.label}
               </Button>
             ))}
@@ -138,7 +155,7 @@ const FeedbackPressDemo = () => {
               { label: 'Warning', fn: () => vibration.notification(NotificationFeedbackType.Warning) },
               { label: 'Error', fn: () => vibration.notification(NotificationFeedbackType.Error) }
             ].map((h) => (
-              <Button key={h.label} mode='contained' hapticDisabled soundDisabled onPress={h.fn} compact>
+              <Button key={h.label} mode='contained' hapticDisabled soundDisabled onPress={h.fn} disabled={!hapticsSupported} compact>
                 {h.label}
               </Button>
             ))}
@@ -270,6 +287,31 @@ const FeedbackPressDemo = () => {
 
           <Divider style={styles.divider} />
           <Text variant='titleMedium' style={styles.sectionLabel}>
+            Hit Slop
+          </Text>
+          <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
+            On plain react-native-paper, hitSlop on an IconButton does nothing: its touchable sits inside a Surface that clips, so the target stays the 40pt button. This package&apos;s IconButton, AppbarAction and AppbarBackAction make it work. The dashed box is each button&apos;s touch area: try pressing just outside each icon.
+          </Text>
+          <WebNote style={styles.hint}>Off on web: browsers ignore hitSlop, so this needs the iOS or Android app.</WebNote>
+          <View style={styles.slopRow}>
+            <View style={styles.compareItem}>
+              <View>
+                <IconButton icon='star-outline' accessibilityLabel='Star, no hit slop' disabled={isWeb} onPress={() => setSlopPresses((p) => ({ ...p, plain: p.plain + 1 }))} />
+                <View pointerEvents='none' style={[styles.slopOutline, styles.slopOutlinePlain, { borderColor: theme.colors.outline }]} />
+              </View>
+              <Text variant='labelSmall'>No hitSlop: {slopPresses.plain}</Text>
+            </View>
+            <View style={styles.compareItem}>
+              <View>
+                <IconButton icon='star-outline' accessibilityLabel='Star, 12pt hit slop' hitSlop={SLOP} disabled={isWeb} onPress={() => setSlopPresses((p) => ({ ...p, slop: p.slop + 1 }))} />
+                <View pointerEvents='none' style={[styles.slopOutline, styles.slopOutlineExtended, { borderColor: theme.colors.primary }]} />
+              </View>
+              <Text variant='labelSmall'>{`hitSlop={${SLOP}}: ${slopPresses.slop}`}</Text>
+            </View>
+          </View>
+
+          <Divider style={styles.divider} />
+          <Text variant='titleMedium' style={styles.sectionLabel}>
             Hold to Repeat
           </Text>
           <Text variant='bodySmall' style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
@@ -320,6 +362,10 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   sectionLabel: { marginBottom: 8 },
   settingRow: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
+  slopOutline: { borderStyle: 'dashed', borderWidth: 1, position: 'absolute' },
+  slopOutlineExtended: { borderRadius: 20 + SLOP, bottom: ICON_BUTTON_MARGIN - SLOP, left: ICON_BUTTON_MARGIN - SLOP, right: ICON_BUTTON_MARGIN - SLOP, top: ICON_BUTTON_MARGIN - SLOP },
+  slopOutlinePlain: { borderRadius: 20, bottom: ICON_BUTTON_MARGIN, left: ICON_BUTTON_MARGIN, right: ICON_BUTTON_MARGIN, top: ICON_BUTTON_MARGIN },
+  slopRow: { flexDirection: 'row', gap: 48, justifyContent: 'center', paddingVertical: 8 },
   soundSetLabel: { marginBottom: 4 }
 })
 

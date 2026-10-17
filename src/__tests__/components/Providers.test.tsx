@@ -6,6 +6,7 @@ import { Portal } from 'react-native-paper'
 import { Providers } from '../../components/Providers'
 
 const mockFeedbackProviderCalls: unknown[] = []
+const mockToasterCalls: any[] = []
 const mockUseUpdater = jest.fn()
 jest.mock('@rific/auto-paper', () => ({
   // The real Provider renders a portal host above everything Providers mounts inside Theme, so
@@ -15,8 +16,11 @@ jest.mock('@rific/auto-paper', () => ({
     const { Portal: PaperPortal } = require('react-native-paper')
     return React.createElement(PaperPortal.Host, null, props.children)
   },
+  BlurView: (props: any) => props.children,
   themeActions: { initialize: (payload: unknown) => ({ payload, type: 'theme/initialize' }) },
   themeReducer: (state = { appearance: 'system', blur: true, color: '#4caf50', harmony: 'split-complementary' }) => state,
+  useAutoPaperTheme: () => ({ fonts: { bodyMedium: { fontFamily: 'Body', fontSize: 14 }, bodySmall: { fontFamily: 'Body', fontSize: 12 } } }),
+  useBlur: () => true,
   useThemeBridgeProps: (props: unknown) => props
 }))
 
@@ -29,6 +33,9 @@ jest.mock('@rific/feedback-press', () => ({
   },
   // Deliberately the opposite of the package defaults (vibrate: true, enabled: !__DEV__), so the
   // 'from the store' assertions below fail if FeedbackBridge ever stops reading state.haptic/sound.
+  // store.ts builds the sound slice's starting state from defaultSoundSettings, so that's where
+  // the sound side's opposite default goes.
+  defaultSoundSettings: { enabled: true },
   hapticReducer: (state = { vibrate: false }) => state,
   soundReducer: (state = { enabled: true }) => state,
   useFeedbackBridgeProps: (props: unknown) => props
@@ -39,7 +46,10 @@ jest.mock('@rific/feedback-press', () => ({
 jest.mock('@rific/toaster', () => ({
   ...jest.requireActual('@rific/toaster'),
   HistoryModal: () => null,
-  Toaster: () => null
+  Toaster: (props: unknown) => {
+    mockToasterCalls.push(props)
+    return null
+  }
 }))
 
 jest.mock('@rific/updater', () => ({
@@ -63,6 +73,7 @@ const ToastTitles = () => {
 
 beforeEach(() => {
   mockFeedbackProviderCalls.length = 0
+  mockToasterCalls.length = 0
   mockUseUpdater.mockClear()
 })
 
@@ -118,6 +129,20 @@ describe('Providers', () => {
       onError('network unavailable')
     })
     expect(getByText('Update check failed')).toBeTruthy()
+  })
+
+  it("draws toasts in the theme's type, on a custom card, with the drawer history", async () => {
+    await render(
+      <Providers>
+        <Text>child</Text>
+      </Providers>
+    )
+    expect(mockToasterCalls.length).toBeGreaterThan(0)
+    const props = mockToasterCalls[0]
+    expect(props.labelStyle).toEqual({ fontFamily: 'Body', fontSize: 14 })
+    expect(props.captionStyle).toEqual({ fontFamily: 'Body', fontSize: 12 })
+    expect(typeof props.Card).toBe('function')
+    expect(props.historyModal).toBeTruthy()
   })
 
   // Dialog/Menu content renders through a Portal; without the host inside ToastProvider it would

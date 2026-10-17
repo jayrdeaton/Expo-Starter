@@ -2,6 +2,8 @@
 
 A lean, production-ready Expo starter with file-based routing, Redux, theming, and a curated set of `@rific` packages pre-wired.
 
+**Live demo:** [rific.jaydeaton.com](https://rific.jaydeaton.com), the web build of this app. Each package's demo has its own URL, e.g. [rific.jaydeaton.com/demos/toaster](https://rific.jaydeaton.com/demos/toaster). On web, sound starts off, screens are capped at 640px wide, and controls that need the iOS or Android app (OTA updates, the keyboard inset, `hitSlop`) are turned off with a note. Haptics work in Chrome on Android and are turned off in other browsers.
+
 ## Stack
 
 | Layer | Package |
@@ -40,18 +42,25 @@ export { safeBack };
 
 ### `@rific/auto-paper`
 
-Adaptive `react-native-paper` theming. Derives a full triadic Material 3 palette from a single seed color and wires it to system / light / dark appearance automatically. Also carries fixed `success`/`warning`/`danger` semantic color roles (each with `on*`/`*Container` variants) alongside MD3's built-in `error`, and a typed `useAutoPaperTheme()` hook for reading them with full autocomplete. Bridged to Redux in [`Theme.tsx`](src/components/Theme.tsx) for persistence, with `useThemeBridgeProps` building the Provider's `initialValue`/`onChange`/`onReady` props. `expoBlur` injects `expo-blur`, so `BlurView` (and every `blur: true` surface built on it) renders real frosted glass; without it, it silently renders its solid fallback.
+Adaptive `react-native-paper` theming. Derives a full triadic Material 3 palette from a single seed color and wires it to system / light / dark appearance automatically. Also carries fixed `success`/`warning`/`danger` semantic color roles (each with `on*`/`*Container` variants) alongside MD3's built-in `error`, and a typed `useAutoPaperTheme()` hook for reading them with full autocomplete. Bridged to Redux in [`Theme.tsx`](src/components/Theme.tsx) for persistence, with `useThemeBridgeProps` building the Provider's `initialValue`/`onChange`/`onReady` props. `expoBlur` injects `expo-blur`, so `BlurView` (and every `blur: true` surface built on it) renders real frosted glass; without it, it silently renders its solid fallback. `maskedView` injects `@react-native-masked-view/masked-view`, so `FadingScrollView` fades its content out at an edge while there is more to scroll past it (the auto-paper demo's scrolling dialog); without it, it scrolls with no fade on iOS and Android (web needs nothing).
+
+`statusBar={false}` turns off auto-paper's own React Native `StatusBar`: the status bar is styled per screen instead, by the root Stack's `statusBarStyle` screen option in [`_layout.tsx`](src/app/_layout.tsx), which follows the theme. An app linked against the iOS 27 SDK can't set the status bar app-wide, which is the only thing React Native's `StatusBar` does on iOS, so per-screen options are the way to style it there. They need `UIViewControllerBasedStatusBarAppearance` on (set in [app.json](app.json)), and with that key on, a mounted `StatusBar` logs an error. In a development (dev-client) build on iOS the bar keeps the system's style, since expo-dev-launcher's own view controller sits above react-native-screens' stack; preview and production builds don't have it.
 
 ```ts
+import MaskedView from '@react-native-masked-view/masked-view';
 import { Provider, useAutoPaperTheme, useThemeBridgeProps } from '@rific/auto-paper';
 import * as ExpoBlur from 'expo-blur';
 
 // settings/onChange come from Redux, onReady marks the splash gate
 const bridgeProps = useThemeBridgeProps({ initialValue: settings, onChange, onReady });
 
-<Provider expoBlur={ExpoBlur} {...bridgeProps}>
+<Provider expoBlur={ExpoBlur} maskedView={MaskedView} statusBar={false} {...bridgeProps}>
   {children}
 </Provider>
+
+// _layout.tsx, inside the Provider
+const { dark } = useAutoPaperTheme();
+<Stack screenOptions={{ headerShown: false, statusBarStyle: dark ? 'light' : 'dark' }} />
 
 const { colors } = useAutoPaperTheme();
 <Text style={{ color: colors.warning }}>Check your connection</Text>
@@ -61,7 +70,7 @@ const { colors } = useAutoPaperTheme();
 
 ### `@rific/drawer`
 
-Sliding drawer/sheet, spring-animated and theme-aware. Slides in from any of the four edges: `left`/`right` for a nav/settings drawer, `top`/`bottom` for a sheet, same mechanism either way, so one package covers both use cases (this is what makes a standalone bottom-sheet dependency unnecessary in this stack). One `createDrawer()` call per instance; `combineDrawerProviders` flattens nesting multiple drawers into a single wrapper. See [`demos/drawer.tsx`](src/app/demos/drawer.tsx) for a left nav drawer, a right settings drawer, a bottom sheet, and an expandable sheet side by side.
+Sliding drawer/sheet, spring-animated and theme-aware. Slides in from any of the four edges: `left`/`right` for a nav/settings drawer, `top`/`bottom` for a sheet, same mechanism either way, so one package covers both use cases (this is what makes a standalone bottom-sheet dependency unnecessary in this stack). One `createDrawer()` call per instance; `combineDrawerProviders` flattens nesting multiple drawers into a single wrapper. A panel's size is capped at the window's size, and `useDrawerSize()` resolves that same geometry for content sized to the panel. See [`demos/drawer.tsx`](src/app/demos/drawer.tsx) for a left nav drawer, a right settings drawer, a bottom sheet, and an expandable sheet side by side.
 
 ```ts
 import * as AutoPaper from '@rific/auto-paper';
@@ -92,7 +101,7 @@ Each panel comes with a swipe-to-dismiss drag handle and an edge-swipe-to-open g
 
 ### `@rific/scroll-view`
 
-Blur-chrome scroll system. Drop-in replacements for `ScrollView`, `FlatList`, and `SectionList` with floating headers/footers, pull-to-search, keyboard awareness, and horizontal paging. Bridged to Redux in [`Providers.tsx`](src/components/Providers.tsx).
+Blur-chrome scroll system. Drop-in replacements for `ScrollView`, `FlatList`, and `SectionList` with floating headers/footers, pull-to-search, keyboard awareness, and horizontal paging. Bridged to Redux in [`Providers.tsx`](src/components/Providers.tsx). `ScrollViewChromeProvider`, mounted above a `Tabs` navigator, makes an app's own tab bar and each screen's footer hide and reveal with scroll as one piece: see [`demos/scroll-view-chrome/_layout.tsx`](src/app/demos/scroll-view-chrome/_layout.tsx).
 
 ```ts
 import { FlatList, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-view';
@@ -107,7 +116,7 @@ import { FlatList, ScrollViewHeader, ScrollViewProvider } from '@rific/scroll-vi
 
 ### `@rific/feedback-press`
 
-Haptic and sound feedback wrappers for `react-native-paper` and built-in pressable components. Drop-in replacements that fire a `selection` haptic (and, optionally, a sound) on touch-down and `notification` feedback on long press, covering `Button`, `IconButton`, `TouchableRipple`, `Card`, `Chip`, `AppbarBackAction`, `AppbarAction`, `FAB`, `Checkbox`, `Switch`, `SegmentedButtons`, plus the native `Pressable`/`TouchableOpacity`/`TouchableHighlight`. Bridged to Redux in [`Providers.tsx`](src/components/Providers.tsx)'s `FeedbackBridge`, so both the haptics and sound toggles persist; the app-wide sound config is [`useProviderSounds()`](src/hooks/sounds/useDefaultSounds.ts) (a click for `selection`, a pop for `notification`). Sound defaults to off in dev builds and on in production. `paper={RNPaper}` makes the wrappers render as real Paper components; omit it and they render a plain-RN fallback. See [`demos/feedback-press.tsx`](src/app/demos/feedback-press.tsx) for the Paper wrappers in action plus a sound sampler.
+Haptic and sound feedback wrappers for `react-native-paper` and built-in pressable components. Drop-in replacements that fire a `selection` haptic (and, optionally, a sound) on touch-down and `notification` feedback on long press, covering `Button`, `IconButton`, `TouchableRipple`, `Card`, `Chip`, `AppbarBackAction`, `AppbarAction`, `FAB`, `Checkbox`, `Switch`, `SegmentedButtons`, plus the native `Pressable`/`TouchableOpacity`/`TouchableHighlight`. Bridged to Redux in [`Providers.tsx`](src/components/Providers.tsx)'s `FeedbackBridge`, so both the haptics and sound toggles persist; the app-wide sound config is [`useProviderSounds()`](src/hooks/sounds/useDefaultSounds.ts) (a click for `selection`, a pop for `notification`). Sound defaults to off in dev builds and on in production. `paper={RNPaper}` makes the wrappers render as real Paper components; omit it and they render a plain-RN fallback. `hitSlop` works on its `IconButton`, `AppbarAction` and `AppbarBackAction`, where Paper's own clipping Surface swallows it. See [`demos/feedback-press.tsx`](src/app/demos/feedback-press.tsx) for the Paper wrappers in action plus a sound sampler.
 
 ```tsx
 import { Button, FeedbackPressProvider, useFeedbackBridgeProps } from '@rific/feedback-press';
@@ -128,17 +137,27 @@ const bridgeProps = useFeedbackBridgeProps({ initialValue: haptic, onChange, sou
 
 ### `@rific/toaster`
 
-Stacking, animated toast notifications with a history stack and swipe-to-dismiss. Includes a provider and a `useToast` hook. `haptics` and `paper` are optional injections: a light haptic tick on the stack controls, and Paper components instead of the plain-RN fallback UI. This app also swaps the history view's default Modal for a `@rific/drawer` bottom sheet (`HistoryDrawerContainer` in [`Providers.tsx`](src/components/Providers.tsx)), and renders a `Portal.Host` just inside `ToastProvider` so dialogs and menus (which render through a portal) can call `useToast()` too.
+Stacking, animated toast notifications with a history stack and swipe-to-dismiss. Includes a provider and a `useToast` hook. `haptics` and `paper` are optional injections: a light haptic tick on the stack controls, and Paper components instead of the plain-RN fallback UI. This app also swaps the history view's default Modal for a `@rific/drawer` bottom sheet (`HistoryDrawerContainer` in [`Providers.tsx`](src/components/Providers.tsx)), and renders a `Portal.Host` just inside `ToastProvider` so dialogs and menus (which render through a portal) can call `useToast()` too. Its `ThemedToaster` draws each toast on auto-paper's `BlurView` (a custom `Card`), so toasts frost like `Dialog` and `Menu` while the theme's blur is on, and sets `labelStyle`/`captionStyle` from the theme's `bodyMedium`/`bodySmall`, so a `fontFamily` set on auto-paper's `Provider` reaches toasts too.
 
-```ts
-import { Toaster, ToastProvider, useToast } from '@rific/toaster';
+```tsx
+import { BlurView, useAutoPaperTheme, useBlur } from '@rific/auto-paper';
+import { type ToastCardProps, Toaster, ToastProvider, useToast } from '@rific/toaster';
 import * as Haptics from 'expo-haptics';
 import * as RNPaper from 'react-native-paper';
+
+const ToastCard = ({ children, style }: ToastCardProps) => (
+  <BlurView blur={useBlur()} elevation={1} style={[style, { overflow: 'hidden' }]}>{children}</BlurView>
+);
+
+const ThemedToaster = () => {
+  const { fonts } = useAutoPaperTheme();
+  return <Toaster Card={ToastCard} captionStyle={fonts.bodySmall} labelStyle={fonts.bodyMedium} />;
+};
 
 // Wrap your app
 <ToastProvider haptics={Haptics} paper={RNPaper}>
   {children}
-  <Toaster />
+  <ThemedToaster />
 </ToastProvider>
 
 // Trigger anywhere
@@ -280,17 +299,26 @@ npm run doctor       # expo install --fix + expo-doctor
 
 ### EAS
 
-`build` and `update` take an [eas.json](eas.json) build profile (`development`, `preview`, or `production`) and run `npm run verify` first:
+`build` and `update` are plain `eas build` and `eas update`, with the build profiles (`development`, `preview`, `production`) in [eas.json](eas.json). Nothing in them runs `npm run verify`, so run it first:
 
 ```bash
-npm run build development   # local build (expo prebuild --clean + eas build --local), artifact moved to ~/Downloads/Builds/
-npm run build preview       # cloud build
-npm run build production    # cloud build
-npm run update <profile>    # publish an OTA update to that profile's branch
-npm run submit              # eas submit
+npm run build -- --profile preview
+npm run build -- --profile production
+npm run update -- --branch production --environment production --message "..."
+npm run submit
 ```
 
-`npm run update <profile>` needs a clean git working tree: it bumps `otaVersion` in [`release.ts`](src/constants/release.ts), commits that bump on its own (`otaVersion N -> N+1`), then runs `eas update` with your last commit's message. `development` publishes interactively; every other profile publishes non-interactively.
+Before an OTA update, bump `otaVersion` in [`release.ts`](src/constants/release.ts) (the version label shown in the updater demo) and commit it.
+
+### Web
+
+The web build is a single-page app exported with `npx expo export -p web` into `dist/` and hosted on Vercel. [vercel.json](vercel.json) turns off Vercel's own Git deploys and sends every path to `index.html`, so a link straight to a demo route works. [deploy.yml](.github/workflows/deploy.yml) deploys on a `v*` tag: it runs the tests, then `vercel build` and `vercel deploy --prebuilt --prod`, using the `VERCEL_TOKEN`, `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` repo secrets.
+
+```bash
+git tag v1.0.0 && git push origin v1.0.0
+```
+
+`npx expo serve` previews `dist/` locally, but it has no `index.html` fallback, so only links from inside the app work there.
 
 ---
 
@@ -301,12 +329,12 @@ src/
   app/            # expo-router file-based routes (+not-found.tsx for unmatched URLs)
     demos/        # example screens for each included @rific package
     packages/     # example screens for each optional @rific package
-  components/     # shared UI components (Providers, Theme)
+  components/     # shared UI components (Providers, Theme, WebNote, a demo screen shared by two routes)
   constants/      # app-wide constants (incl. release.ts's otaVersion)
   hooks/          # custom hooks, incl. sounds/ packs for @rific/feedback-press
   redux/          # store, slices, persistor
   types/          # shared TypeScript types
-  utils/          # splash gate, navigation (safeBack), and other helpers
+  utils/          # splash gate, navigation (safeBack), web haptics check, web width cap, and other helpers
   __tests__/      # Jest test suite
   __mocks__/      # Jest mocks for native/Expo modules, picked up automatically
 ```
@@ -318,6 +346,7 @@ src/
 - **App identity**: `name`, `slug`, and `scheme` in [app.json](app.json). `scheme` is the deep-link scheme: make it unique per app (e.g. derived from the slug), since the starter's generic `app` collides with any other app claiming it
 - **Bundle identifiers**: `ios.bundleIdentifier` and `android.package` in [app.json](app.json)
 - **EAS project**: `extra.eas.projectId` and `updates.url` (`https://u.expo.dev/<projectId>`) in [app.json](app.json) both point at this starter's EAS project. Delete both, then run `eas init` (creates or links your own project and writes `extra.eas.projectId`) and `eas update:configure` (writes the matching `updates.url`)
+- **Web deploy**: `.vercel/` is gitignored, so a new app starts unlinked. Create its own Vercel project (`vercel link`), then set the three `VERCEL_*` secrets on its repo; the org and project IDs are in `.vercel/project.json`. Delete [deploy.yml](.github/workflows/deploy.yml) and [vercel.json](vercel.json) if the app has no web build
 - **Theme seed color**: defaults to `#6750a4`; override by swapping `themeReducer` for `createThemeReducer({ color: '...' })` from `@rific/auto-paper` in [redux/store.ts](src/redux/store.ts)
 
 ## License

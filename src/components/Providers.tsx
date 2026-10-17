@@ -2,11 +2,11 @@ import * as AutoPaper from '@rific/auto-paper'
 import { Drawer, DrawerProvider } from '@rific/drawer'
 import { FeedbackPressProvider, hapticActions, type HapticSettings, soundActions, type SoundSettings, useFeedbackBridgeProps } from '@rific/feedback-press'
 import { scrollViewActions, type ScrollViewSettings, ScrollViewSettingsProvider } from '@rific/scroll-view'
-import { type HistoryContainerProps, HistoryModal, Toaster, ToastProvider, useUpdateErrorToast } from '@rific/toaster'
+import { type HistoryContainerProps, HistoryModal, type ToastCardProps, Toaster, ToastProvider, useUpdateErrorToast } from '@rific/toaster'
 import { useUpdater } from '@rific/updater'
 import * as Haptics from 'expo-haptics'
 import React, { useCallback, useEffect, useMemo } from 'react'
-import { BackHandler, useWindowDimensions } from 'react-native'
+import { BackHandler, StyleSheet, useWindowDimensions } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { KeyboardProvider } from 'react-native-keyboard-controller'
 import * as RNPaper from 'react-native-paper'
@@ -43,6 +43,23 @@ const HistoryDrawerContainer = ({ children, onClose, visible }: HistoryContainer
       {children}
     </Drawer>
   )
+}
+
+// Each toast is drawn on auto-paper's BlurView, the surface Dialog and Menu use, so toasts frost
+// while the theme's blur setting is on and fall back to the solid surface when it's off (and on
+// Android, where expo-blur needs a blurTarget). overflow: 'hidden' so the card's corner radius clips
+// the blur.
+const ToastCard = ({ children, style }: ToastCardProps) => (
+  <AutoPaper.BlurView blur={AutoPaper.useBlur()} elevation={1} style={[style, styles.toastCard]}>
+    {children}
+  </AutoPaper.BlurView>
+)
+
+// The toast's title and caption in the theme's own type (bodyMedium/bodySmall, the same sizes as the
+// toaster's built-in 14/20 and 12/16), so an app that sets auto-paper's fontFamily gets it here too.
+const ThemedToaster = () => {
+  const { fonts } = AutoPaper.useAutoPaperTheme()
+  return <Toaster Card={ToastCard} captionStyle={fonts.bodySmall} historyModal={<HistoryModal Container={HistoryDrawerContainer} />} labelStyle={fonts.bodyMedium} />
 }
 
 const FeedbackBridge = ({ children }: ProvidersProps) => {
@@ -103,7 +120,7 @@ export const Providers = ({ children }: ProvidersProps) => {
                           <UpdateChecker />
                           {children}
                         </RNPaper.Portal.Host>
-                        <Toaster historyModal={<HistoryModal Container={HistoryDrawerContainer} />} />
+                        <ThemedToaster />
                       </ToastProvider>
                     </Theme>
                   </KeyboardProvider>
@@ -116,3 +133,7 @@ export const Providers = ({ children }: ProvidersProps) => {
     </GestureHandlerRootView>
   )
 }
+
+const styles = StyleSheet.create({
+  toastCard: { overflow: 'hidden' }
+})
